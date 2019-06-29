@@ -23,14 +23,15 @@ void Debug(const char* text)
 const byte PUMP_PIN = 0; // 13, Arduino Uno
 const byte BUTTON_PIN = 1; // 8, Arduino Uno
 
-boolean isTest = true;
+boolean isTest = false;
+
 const uint32_t SECOND_MS = 1350;
 const uint32_t MINUTE_MS = 60 * SECOND_MS;
 const uint32_t HOUR_MS = (isTest) ? SECOND_MS : 60 * MINUTE_MS * SECOND_MS;
 const uint32_t DAY_MS = (isTest) ? 5 * HOUR_MS : 24 * HOUR_MS;
-const uint32_t TIME_TO_WATER_MS = (isTest) ? 3 * SECOND_MS : 2 * DAY_MS;
 
-const uint32_t WATERING_TIME_MS = 5 * SECOND_MS;
+const uint32_t TIME_TO_WATER_MS = (isTest) ? 3 * SECOND_MS : 2 * DAY_MS;
+const uint32_t WATERING_TIME_MS = (isTest) ? 10 * SECOND_MS : MINUTE_MS;
 
 boolean isUnattended = true;
 
