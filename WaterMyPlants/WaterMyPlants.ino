@@ -6,22 +6,22 @@
   Author: Daniel Nistor, Copyright © 2019
 */
 
-const bool DEBUG_MODE = true;
+const bool DEBUG_MODE = false;
 void DebugInit()
 {
-  Serial.begin(57600);
-  Serial.print("Debugging Mode: ");
-  Serial.println(DEBUG_MODE ? "ON" : "OFF");
+//  Serial.begin(9600);
+//  Serial.print("Debugging Mode: ");
+//  Serial.println(DEBUG_MODE ? "ON" : "OFF");
 }
 
 void Debug(const char* text)
 {
-  if (DEBUG_MODE)
-    Serial.println(text);
+//  if (DEBUG_MODE)
+//    Serial.println(text);
 }
 
-const byte PUMP_PIN = 13; // 0
-const byte BUTTON_PIN = 8; // 1
+const byte PUMP_PIN = 0; // 13, Arduino Uno
+const byte BUTTON_PIN = 1; // 8, Arduino Uno
 
 boolean isTest = true;
 const uint32_t SECOND_MS = 1350;
