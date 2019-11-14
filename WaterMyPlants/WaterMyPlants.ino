@@ -2,6 +2,7 @@
   Water My Plants
 
   ToDo: Description, today & tomorrow
+  This is a good day.
 
   Author: Daniel Nistor, Copyright © 2019
 */
@@ -9,7 +10,7 @@
 const bool DEBUG_MODE = false;
 void DebugInit()
 {
-//  Serial.begin(9600);
+  Serial.begin(9600);
 //  Serial.print("Debugging Mode: ");
 //  Serial.println(DEBUG_MODE ? "ON" : "OFF");
 }
