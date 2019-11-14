@@ -10,7 +10,7 @@
 const bool DEBUG_MODE = false;
 void DebugInit()
 {
-  Serial.begin(9600);
+  Serial.begin(115200);
 //  Serial.print("Debugging Mode: ");
 //  Serial.println(DEBUG_MODE ? "ON" : "OFF");
 }
