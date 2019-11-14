@@ -1,7 +1,7 @@
 /*
   Water My Plants
 
-  ToDo: Description, today
+  ToDo: Description, today & tomorrow
 
   Author: Daniel Nistor, Copyright © 2019
 */
