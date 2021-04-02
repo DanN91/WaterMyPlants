@@ -1,0 +1,14 @@
+*** Water My Plants Hardware Components ***
+
+*** Components ***
+3 x Momentary Switch
+3 x 10k Resistor
+
+1 x 10mm LED
+1 x 10k Resistor
+
+1 x Photoresistor
+1 x 10k Resistor
+
+1 x 2N2222 Transistor
+1 x 1k Resistor
