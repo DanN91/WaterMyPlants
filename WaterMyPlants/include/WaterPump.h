@@ -1,6 +1,6 @@
 /*
     Author: Daniel Nistor
-    Purpose: Simple interface over water pump hardware.
+    Purpose: Simple interface over one-pin water pump hardware.
     MIT License, 2021
 */
 
