@@ -20,6 +20,12 @@ public:
 
     bool IsOn() const;
 
+    // non-movable & non-copyable
+    WaterPump(const WaterPump&) = delete;
+    WaterPump& operator=(const WaterPump&) = delete;
+    WaterPump(WaterPump&&) = delete;
+    WaterPump& operator=(WaterPump&&) = delete;
+
 private:
     const uint8_t m_pin;
 };
