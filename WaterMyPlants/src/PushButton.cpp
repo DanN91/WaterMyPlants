@@ -4,37 +4,57 @@
 
 #include "PushButton.h"
 
+namespace
+{
+    constexpr const uint16_t DEBOUNCE_DELAY_MS = 50;
+    constexpr const uint16_t HELD_THRESHOLD_MS = 1000;
+} // anonymous
+
 PushButton::PushButton(uint8_t pin, uint8_t MAX_OBSERVERS_COUNT)
     : IObservable(MAX_OBSERVERS_COUNT)
     , m_pin(pin)
 {
 }
 
-void PushButton::Initialize() const { pinMode(m_pin, INPUT); }
+void PushButton::Initialize() const
+{
+    pinMode(m_pin, INPUT);
+}
 
 void PushButton::HandleEvents()
 {
-    constexpr const uint16_t DEBOUNCE_DELAY = 50;
+    volatile bool reading = digitalRead(m_pin);
 
-    static bool m_buttonState = false;
-    static bool lastButtonState = false;
-    static uint32_t lastDebounceTime = 0;
+    if (reading != m_lastButtonState)
+        m_lastDebounceTime = millis();
 
-    const bool reading = digitalRead(m_pin);
-
-    if (reading != lastButtonState)
-        lastDebounceTime = millis();
-
-    if ((millis() - lastDebounceTime) > DEBOUNCE_DELAY)
+    if ((millis() - m_lastDebounceTime) > DEBOUNCE_DELAY_MS)
     {
-        if (reading != m_buttonState)
+        if (reading != m_lastReading)
         {
-            m_buttonState = reading;
+            m_lastReading = reading;
 
-            if (m_buttonState == LOW)
-                Notify(static_cast<uint16_t>(ButtonState::Clicked));
+            if (m_lastReading == LOW)
+            {
+                if ((millis() - m_lastPressedTime) >= HELD_THRESHOLD_MS)
+                {
+                    // Serial.println("BTN:Held");
+                    Notify(ButtonState::Held);
+                }
+                else
+                {
+                    // Serial.println("BTN:Released");
+                    Notify(ButtonState::Released);
+                }
+            }
+            else
+            {
+                // Serial.println("BTN:Pressed");
+                Notify(ButtonState::Pressed);
+                m_lastPressedTime = millis();
+            }
         }
     }
 
-    lastButtonState = reading;
+    m_lastButtonState = reading;
 }
