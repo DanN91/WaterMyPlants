@@ -5,24 +5,24 @@
 #pragma once
 
 #include <WaterPump.h>
+#include <PushButtonMasks.h>
 
-#include <IObserver.h>
+#include <ObserverPattern.h>
 #include <IOperationMode.h>
 
-class ManualMode final : public IObserver, public IOperationMode
+class ManualMode final : public IObserver<ButtonState>, public IOperationMode
 {
 public:
-    ManualMode(WaterPump& waterPump);
+    ManualMode(WaterPump& waterPump, IObservable<ButtonState>& button);
+    ~ManualMode() = default;
 
     // IObserver
-    void OnEvent(uint16_t event) override;
+    void OnEvent(ButtonState event) override;
 
     // IOperationMode
     void Run() override;
 
 private:
-    static constexpr uint32_t MAX_ON_TIME_LIMIT_MS = 90000u; // 90 seconds should suffice
-
     WaterPump& m_waterPump;
     uint32_t m_lastOn = 0;
 };

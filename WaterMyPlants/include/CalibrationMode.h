@@ -7,16 +7,24 @@
 #pragma once
 
 #include <IOperationMode.h>
-#include <ManualMode.h>
 
-class CalibrationMode final : public IOperationMode
+#include <PushButtonMasks.h>
+#include <ManualMode.h>
+#include <Stopwatch.h>
+
+class CalibrationMode final : public IObserver<ButtonState>, public IOperationMode
 {
 public:
-    CalibrationMode(ManualMode& manualMode);
+    CalibrationMode(WaterPump& waterPump, IObservable<ButtonState>& button);
+    ~CalibrationMode() = default;
+
+    // IObserver
+    void OnEvent(ButtonState event) override;
 
     // IOperationMode
     void Run() override;
 
 private:
-    ManualMode& m_manualMode;
+    ManualMode m_manualMode;
+    Stopwatch m_stopwatch;
 };

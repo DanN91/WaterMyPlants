@@ -13,4 +13,11 @@ public:
     virtual ~IOperationMode() = default;
 
     virtual void Run() = 0;
+
+protected:
+    // non-copyable & non-movable
+    IOperationMode(const IOperationMode&) = delete;
+    IOperationMode& operator=(const IOperationMode&) = delete;
+    IOperationMode(IOperationMode&&) = delete;
+    IOperationMode& operator=(IOperationMode&&) = delete;
 };
