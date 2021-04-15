@@ -1,5 +1,7 @@
 /*
-    ...
+    Stopwatch: track time in milliseconds or seconds by using a pushbutton for starting and stopping the watch.
+    Author: Daniel Nistor
+    License: MIT
 */
 
 #pragma once
@@ -18,8 +20,8 @@ public:
     // IObserver
     void OnEvent(ButtonState event) override;
 
-    uint32_t DurationMs();
-    uint32_t DurationSec();
+    uint32_t DurationMs() const;
+    uint32_t DurationSec() const;
 
 private:
     void Start();

@@ -1,7 +1,7 @@
 /*
-    Watering mode which controls a water pump, turning it on and off based on set time frequency and duration.
+    TimerMode: watering mode which controls a water pump, turning it on and off based on set time frequency and duration.
     Author: Daniel Nistor
-    License: MIT
+    MIT License, 2021
 */
 
 #pragma once

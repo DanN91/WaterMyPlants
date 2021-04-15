@@ -1,5 +1,7 @@
 /*
-    ...
+    Stopwatch: track time in milliseconds or seconds by using a pushbutton for starting and stopping the watch.
+    Author: Daniel Nistor
+    License: MIT
 */
 
 #include "Stopwatch.h"
@@ -18,15 +20,11 @@ void Stopwatch::OnEvent(ButtonState event)
 void Stopwatch::Start()
 {
     m_startedAtMs = millis();
-    // Serial.print("Started: ");
-    // Serial.println(m_startedAtMs);
 }
 
 void Stopwatch::Stop()
 {
     m_stoppedAtMs = millis();
-    // Serial.print("Stopped: ");
-    // Serial.println(m_stoppedAtMs);
 }
 
 bool Stopwatch::IsRunning() const
@@ -34,25 +32,12 @@ bool Stopwatch::IsRunning() const
     return m_startedAtMs > m_stoppedAtMs;
 }
 
-uint32_t Stopwatch::DurationMs()
+uint32_t Stopwatch::DurationMs() const
 {
-    if (m_stoppedAtMs < m_startedAtMs)
-    {
-        // Serial.println("Stopwatch:Stopped not called!");
-        return 0; // not stopped properly
-    }
-
-    const auto duration = m_stoppedAtMs - m_startedAtMs;
-    // Serial.print(m_stoppedAtMs);
-    // Serial.print(" - ");
-    // Serial.print(m_startedAtMs);
-    // Serial.print(" = ");
-    // Serial.println(duration);
-
-    return duration;
+    return (m_stoppedAtMs < m_startedAtMs) ? 0 : (m_stoppedAtMs - m_startedAtMs);
 }
 
-uint32_t Stopwatch::DurationSec()
+uint32_t Stopwatch::DurationSec() const
 {
     return DurationMs() / 1000;
 }

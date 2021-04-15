@@ -23,7 +23,4 @@ namespace Constants
         constexpr const uint8_t WATERING_DURATION_SECONDS = 0x20; // 32, 2 bytes
         constexpr const uint8_t WATERING_FREQUENCY_MINUTES = 0x22; // 34, 2 bytes
     }
-
-    // OTHER
-    constexpr const auto TIME_TO_WATER_MS = 30 * SECOND_MS;
 }

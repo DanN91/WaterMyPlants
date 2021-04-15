@@ -1,6 +1,6 @@
 /*
+    CalibrationMode: allows the user to set the watering duration and frequency and storing that value persistently for further usage.
     Author: Daniel Nistor
-    Purpose: Decorator over ManualMode responsible with allowing the user to set the watering time via start-stop and storing that value persistently for further usage.
     MIT License, 2021
 */
 

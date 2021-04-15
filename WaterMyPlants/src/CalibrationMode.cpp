@@ -1,6 +1,6 @@
 /*
+    CalibrationMode: allows the user to set the watering duration and frequency and storing that value persistently for further usage.
     Author: Daniel Nistor
-    Purpose: Component responsible with allowing the user to set the watering time via start-stop and storing that value persistently for further usage.
     MIT License, 2021
 */
 
@@ -22,11 +22,13 @@ void CalibrationMode::OnEvent(ButtonState event)
     {
         // write watering time to persistent storage
         uint16_t storedDuration = 0;
-        if (const auto duration = m_stopwatch.DurationSec(); duration != EEPROM.get<uint16_t>(Constants::WATERING_DURATION_SEC_ADDRESS, storedDuration))
+        if (const auto duration = m_stopwatch.DurationSec(); duration != EEPROM.get<uint16_t>(Constants::Addresses::WATERING_DURATION_SECONDS, storedDuration))
         {
-            EEPROM.put<uint16_t>(Constants::WATERING_DURATION_SEC_ADDRESS, duration);
+            EEPROM.put<uint16_t>(Constants::Addresses::WATERING_DURATION_SECONDS, duration);
             Serial.print("CM:Watering time: ");
             Serial.println(duration);
+
+            // #DNN:ToDo:Implement storing also the WATERING FREQUENCY
         }
     }
 }
