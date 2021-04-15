@@ -14,7 +14,7 @@ class ManualMode final : public IObserver<ButtonState>, public IOperationMode
 {
 public:
     ManualMode(WaterPump& waterPump, IObservable<ButtonState>& button);
-    ~ManualMode() = default;
+    ~ManualMode();
 
     // IObserver
     void OnEvent(ButtonState event) override;

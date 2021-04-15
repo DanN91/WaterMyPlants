@@ -17,6 +17,12 @@ ManualMode::ManualMode(WaterPump& waterPump, IObservable<ButtonState>& button)
 {
 }
 
+ManualMode::~ManualMode()
+{
+    if (m_waterPump.IsOn())
+        m_waterPump.TurnOff();
+}
+
 void ManualMode::OnEvent(ButtonState event)
 {
     if (event == ButtonState::Released)

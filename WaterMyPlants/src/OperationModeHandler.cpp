@@ -31,7 +31,7 @@ namespace
                 return "Sensor";
         }
 
-        return "OPERATION NOT FOUND";
+        return "Not found";
     }
 } // anonymous
 
@@ -66,7 +66,6 @@ void OperationModeHandler::SetOperationMode(OperationMode operationMode)
 
     m_current = operationMode;
 
-    Serial.print("Operation Mode: ");
     Serial.println(GetOperationStr(m_current));
 
     switch (operationMode)
@@ -92,6 +91,7 @@ void OperationModeHandler::SetOperationMode(OperationMode operationMode)
         case OperationMode::Sensor:
         {
             // #DNN:ToDo
+            m_operation = nullptr;
             break;
         }
 

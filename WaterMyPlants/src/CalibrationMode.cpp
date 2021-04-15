@@ -14,9 +14,6 @@ CalibrationMode::CalibrationMode(WaterPump& waterPump, IObservable<ButtonState>&
     , m_manualMode(waterPump, button)
     , m_stopwatch(button)
 {
-    // safeguard against a too big watering time to INVALID_WATERING_TIME
-    if (EEPROM.read(Constants::WATERING_TIME_SEC_ADDRESS) > Constants::MAX_WATERING_TIME_SEC)
-        EEPROM.write(Constants::WATERING_TIME_SEC_ADDRESS, Constants::MAX_WATERING_TIME_SEC); // truncate to max
 }
 
 void CalibrationMode::OnEvent(ButtonState event)
@@ -24,9 +21,10 @@ void CalibrationMode::OnEvent(ButtonState event)
     if (event == ButtonState::Held)
     {
         // write watering time to persistent storage
-        if (const auto duration = m_stopwatch.DurationSec(); duration != EEPROM.read(Constants::WATERING_TIME_SEC_ADDRESS))
+        uint16_t storedDuration = 0;
+        if (const auto duration = m_stopwatch.DurationSec(); duration != EEPROM.get<uint16_t>(Constants::WATERING_DURATION_SEC_ADDRESS, storedDuration))
         {
-            EEPROM.write(Constants::WATERING_TIME_SEC_ADDRESS, duration);
+            EEPROM.put<uint16_t>(Constants::WATERING_DURATION_SEC_ADDRESS, duration);
             Serial.print("CM:Watering time: ");
             Serial.println(duration);
         }
@@ -35,5 +33,4 @@ void CalibrationMode::OnEvent(ButtonState event)
 
 void CalibrationMode::Run()
 {
-    m_manualMode.Run();
 }
