@@ -9,6 +9,7 @@
 #include <ObserverPattern.h>
 
 #include <PushButton.h>
+#include <RangeValuesGenerator.h>
 #include <WaterPump.h>
 
 class IOperationMode;
@@ -16,7 +17,6 @@ class IOperationMode;
 enum class OperationMode : uint8_t
 {
     Manual = 0,
-    Calibration,
     Timer,
     Sensor,
     None // must be the last
@@ -44,7 +44,8 @@ private:
     void SetOperationMode(OperationMode operationMode);
 
     IOperationMode* m_operation = nullptr;
-    OperationMode m_current = OperationMode::None;
+
+    RangeValuesGenerator m_generator;
 
     // hardware
     WaterPump m_waterPump;
