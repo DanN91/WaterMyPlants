@@ -11,6 +11,7 @@
 #include <PushButton.h>
 #include <RangeValuesGenerator.h>
 #include <WaterPump.h>
+#include <PersistenceManager.h>
 
 class IOperationMode;
 
@@ -25,7 +26,7 @@ enum class OperationMode : uint8_t
 class OperationModeHandler final : public IObserver<ButtonState>
 {
 public:
-    explicit OperationModeHandler(OperationMode defaultMode, IObservable<ButtonState>& subject);
+    explicit OperationModeHandler(IObservable<ButtonState>& subject, PersistenceManager& persistence);
     ~OperationModeHandler();
 
     void Initialize() const;
@@ -46,6 +47,7 @@ private:
     IOperationMode* m_operation = nullptr;
 
     RangeValuesGenerator m_generator;
+    PersistenceManager& m_persistence;
 
     // hardware
     WaterPump m_waterPump;

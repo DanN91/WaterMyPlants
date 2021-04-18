@@ -5,14 +5,14 @@
 */
 
 #include "CalibrationMode.h"
+
 #include "Constants.h"
 
-#include <EEPROM.h>
-
-CalibrationMode::CalibrationMode(WaterPump& waterPump, IObservable<ButtonState>& button)
+CalibrationMode::CalibrationMode(WaterPump& waterPump, IObservable<ButtonState>& button, PersistenceManager& persistence)
     : IObserver<ButtonState>(ButtonState::Held, button)
     , m_manualMode(waterPump, button)
     , m_stopwatch(button)
+    , m_persistence(persistence)
 {
 }
 
@@ -21,10 +21,9 @@ void CalibrationMode::OnEvent(ButtonState event)
     if (event == ButtonState::Held)
     {
         // write watering time to persistent storage
-        uint16_t storedDuration = 0;
-        if (const auto duration = m_stopwatch.DurationSec(); duration != EEPROM.get<uint16_t>(Constants::Addresses::WATERING_DURATION_SECONDS, storedDuration))
+        if (const auto duration = m_stopwatch.DurationSec(); duration != m_persistence.TimerModeDuration())
         {
-            EEPROM.put<uint16_t>(Constants::Addresses::WATERING_DURATION_SECONDS, duration);
+            m_persistence.TimerModeDuration(duration);
             Serial.print("CM:Watering time: ");
             Serial.println(duration);
 

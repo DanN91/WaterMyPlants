@@ -11,13 +11,15 @@
 #include <TimerMode.h>
 // #include <SensorMode.h>
 
-OperationModeHandler::OperationModeHandler(OperationMode defaultMode, IObservable<ButtonState>& subject)
+OperationModeHandler::OperationModeHandler(IObservable<ButtonState>& subject, PersistenceManager& persistence)
     : IObserver(ButtonState::Pressed, subject)
     , m_generator(0, static_cast<uint8_t>(OperationMode::None) - 1, subject)
+    , m_persistence(persistence)
     , m_waterPump(Hardware::WATER_PUMP_PIN)
     , m_executionButton(Hardware::EXECUTION_BUTTON_PIN, 3)
 {
-    SetOperationMode(defaultMode);
+    if (const auto lastOperationMode = m_persistence.LastOperationMode(); lastOperationMode < static_cast<uint8_t>(OperationMode::None))
+        SetOperationMode(static_cast<OperationMode>(lastOperationMode));
 }
 
 OperationModeHandler::~OperationModeHandler()
@@ -51,7 +53,7 @@ void OperationModeHandler::SetOperationMode(OperationMode operationMode)
 
         case OperationMode::Timer:
         {
-            m_operation = new TimerMode(m_waterPump);
+            m_operation = new TimerMode(m_waterPump, m_persistence);
             break;
         }
 
@@ -62,6 +64,8 @@ void OperationModeHandler::SetOperationMode(OperationMode operationMode)
             break;
         }
     }
+
+    m_persistence.LastOperationMode(static_cast<uint8_t>(operationMode));
 }
 
 void OperationModeHandler::Run()

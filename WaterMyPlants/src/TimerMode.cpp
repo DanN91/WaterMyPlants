@@ -7,16 +7,12 @@
 #include "TimerMode.h"
 
 #include "Constants.h"
-#include <EEPROM.h>
 
-TimerMode::TimerMode(WaterPump &waterPump)
+TimerMode::TimerMode(WaterPump& waterPump, PersistenceManager& persistence)
     : m_waterPump(waterPump)
+    , WATERING_DURATION_SEC(persistence.TimerModeDuration())
+    , WATERING_FREQUENCY_DAYS(persistence.TimerModeFrequency())
 {
-    // read from persistent storage
-    EEPROM.get<uint16_t>(Constants::Addresses::WATERING_DURATION_SECONDS, WATERING_DURATION_SEC);
-    EEPROM.get<uint16_t>(Constants::Addresses::WATERING_FREQUENCY_MINUTES, WATERING_FREQUENCY_MIN);
-
-    // Serial.println(WATERING_TIME_MS);
     m_timeToWaterCounterMs = millis();
 }
 
@@ -29,7 +25,7 @@ TimerMode::~TimerMode()
 void TimerMode::Run()
 {
     volatile auto currentMs = millis();
-    if (!m_waterPump.IsOn() && (currentMs - m_timeToWaterCounterMs) >= (WATERING_FREQUENCY_MIN * Constants::Time::MINUTE_MS))
+    if (!m_waterPump.IsOn() && (currentMs - m_timeToWaterCounterMs) >= (WATERING_FREQUENCY_DAYS * Constants::Time::HOUR_MS))
     {
         // pump ON
         m_waterPump.TurnOn();
