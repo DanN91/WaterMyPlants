@@ -1,19 +1,20 @@
-
+/*
+    MenuItem: represents data for a menu item.
+    Author: Daniel Nistor
+    MIT License, 2021
+*/
 
 #pragma once
 
 #include <Arduino.h>
 
-#include <PersistenceManager.h>
+#include <SettingsManager.h>
+#include <StringsManager.h>
 
 class MenuItem final
 {
 public:
-    MenuItem(Strings::Address stringAddress, Settings::Address settingAddress)
-        : m_stringAddress(stringAddress)
-        , m_settingAddress(settingAddress)
-    {
-    }
+    MenuItem(Strings::Address stringAddress, Settings::Address settingAddress);
 
     MenuItem() = default;
     ~MenuItem() = default;
@@ -25,15 +26,8 @@ public:
     MenuItem(MenuItem&&) = default;
     MenuItem& operator=(MenuItem&&) = default;
 
-    Strings::Address Text() const
-    {
-        return m_stringAddress;
-    }
-
-    Settings::Address Value() const
-    {
-        return m_settingAddress;
-    }
+    Strings::Address Text() const;
+    Settings::Address Value() const;
 
 private:
     Strings::Address m_stringAddress = Strings::Address::Invalid;

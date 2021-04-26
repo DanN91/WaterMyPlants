@@ -1,4 +1,6 @@
-// #DNN:TODO
+/*
+    ...
+*/
 
 #pragma once
 
@@ -7,7 +9,7 @@
 #include <Array.h>
 #include <MenuItem.h>
 #include <IOperationMode.h>
-#include <PersistenceManager.h>
+#include <StringsManager.h>
 
 class Menu final
 {
@@ -24,6 +26,11 @@ public:
     uint8_t ItemsCount() const;
 
     // void Execute(uint8_t itemIndex, eButtonState buttonState) const;
+    // copyable & movable
+    Menu(const Menu&) = default;
+    Menu& operator=(const Menu&) = default;
+    Menu(Menu&&) = default;
+    Menu& operator=(Menu&&) = default;
 
 private:
     // void HandleSettingChange(uint8_t lineIndex);

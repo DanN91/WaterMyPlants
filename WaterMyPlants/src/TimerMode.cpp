@@ -8,10 +8,12 @@
 
 #include "Constants.h"
 
-TimerMode::TimerMode(WaterPump& waterPump, PersistenceManager& persistence)
+#include <SettingsManager.h>
+
+TimerMode::TimerMode(WaterPump& waterPump, SettingsManager& settings)
     : m_waterPump(waterPump)
-    , WATERING_DURATION_SEC(persistence.TimerModeDuration())
-    , WATERING_FREQUENCY_DAYS(persistence.TimerModeFrequency())
+    , WATERING_DURATION_SEC(settings.Read(Settings::Address::TimerModeDuration))
+    , WATERING_FREQUENCY_DAYS(settings.Read(Settings::Address::TimerModeFrequency))
 {
     m_timeToWaterCounterMs = millis();
 }
@@ -25,7 +27,7 @@ TimerMode::~TimerMode()
 void TimerMode::Run()
 {
     volatile auto currentMs = millis();
-    if (!m_waterPump.IsOn() && (currentMs - m_timeToWaterCounterMs) >= (WATERING_FREQUENCY_DAYS * Constants::Time::HOUR_MS))
+    if (!m_waterPump.IsOn() && (currentMs - m_timeToWaterCounterMs) >= (WATERING_FREQUENCY_DAYS * Constants::Time::DAY_MS))
     {
         // pump ON
         m_waterPump.TurnOn();

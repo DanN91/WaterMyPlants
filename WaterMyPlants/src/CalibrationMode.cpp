@@ -8,11 +8,11 @@
 
 #include "Constants.h"
 
-CalibrationMode::CalibrationMode(WaterPump& waterPump, IObservable<ButtonState>& button, PersistenceManager& persistence)
+CalibrationMode::CalibrationMode(WaterPump& waterPump, IObservable<ButtonState>& button, SettingsManager& settings)
     : IObserver<ButtonState>(ButtonState::Held, button)
     , m_manualMode(waterPump, button)
     , m_stopwatch(button)
-    , m_persistence(persistence)
+    , m_settings(settings)
 {
 }
 
@@ -21,12 +21,9 @@ void CalibrationMode::OnEvent(ButtonState event)
     if (event == ButtonState::Held)
     {
         // write watering time to persistent storage
-        if (const auto duration = m_stopwatch.DurationSec(); duration != m_persistence.TimerModeDuration())
+        if (const auto duration = m_stopwatch.DurationSec(); duration != m_settings.Read(Settings::Address::TimerModeDuration))
         {
-            m_persistence.TimerModeDuration(duration);
-            Serial.print("CM:Watering time: ");
-            Serial.println(duration);
-
+            m_settings.Write(Settings::Address::TimerModeDuration, duration);
             // #DNN:ToDo:Implement storing also the WATERING FREQUENCY
         }
     }

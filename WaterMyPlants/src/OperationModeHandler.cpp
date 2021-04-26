@@ -5,21 +5,21 @@
 #include "OperationModeHandler.h"
 
 #include <Hardware.h>
+#include <SettingsManager.h>
 
 #include <IOperationMode.h>
 #include <ManualMode.h>
 #include <TimerMode.h>
 // #include <SensorMode.h>
 
-OperationModeHandler::OperationModeHandler(IObservable<ButtonState>& subject, PersistenceManager& persistence)
+OperationModeHandler::OperationModeHandler(IObservable<ButtonState>& subject, PushButton& executionButton, SettingsManager& settings)
     : IObserver(ButtonState::Pressed, subject)
-    , m_generator(0, static_cast<uint8_t>(OperationMode::None) - 1, subject)
-    , m_persistence(persistence)
+    , m_generator({ 0, static_cast<uint8_t>(OperationMode::None) - 1 }, 1, settings.Read(Settings::Address::LastOperationMode), subject)
+    , m_settings(settings)
     , m_waterPump(Hardware::WATER_PUMP_PIN)
-    , m_executionButton(Hardware::EXECUTION_BUTTON_PIN, 3)
+    , m_executionButton(executionButton)
 {
-    if (const auto lastOperationMode = m_persistence.LastOperationMode(); lastOperationMode < static_cast<uint8_t>(OperationMode::None))
-        SetOperationMode(static_cast<OperationMode>(lastOperationMode));
+    SetOperationMode(static_cast<OperationMode>(m_generator.Value()));
 }
 
 OperationModeHandler::~OperationModeHandler()
@@ -31,7 +31,6 @@ OperationModeHandler::~OperationModeHandler()
 void OperationModeHandler::Initialize() const
 {
     m_waterPump.Initialize();
-    m_executionButton.Initialize();
 }
 
 void OperationModeHandler::SetOperationMode(OperationMode operationMode)
@@ -43,6 +42,8 @@ void OperationModeHandler::SetOperationMode(OperationMode operationMode)
         m_operation = nullptr;
     }
 
+    m_currentMode = operationMode;
+
     switch (operationMode)
     {
         case OperationMode::Manual:
@@ -53,7 +54,7 @@ void OperationModeHandler::SetOperationMode(OperationMode operationMode)
 
         case OperationMode::Timer:
         {
-            m_operation = new TimerMode(m_waterPump, m_persistence);
+            m_operation = new TimerMode(m_waterPump, m_settings);
             break;
         }
 
@@ -65,7 +66,7 @@ void OperationModeHandler::SetOperationMode(OperationMode operationMode)
         }
     }
 
-    m_persistence.LastOperationMode(static_cast<uint8_t>(operationMode));
+    m_settings.Write(Settings::Address::LastOperationMode, static_cast<uint8_t>(operationMode));
 }
 
 void OperationModeHandler::Run()
@@ -74,6 +75,11 @@ void OperationModeHandler::Run()
 
     if (m_operation)
         m_operation->Run();
+}
+
+OperationMode OperationModeHandler::CurrentMode() const
+{
+    return m_currentMode;
 }
 
 void OperationModeHandler::OnEvent(ButtonState event)

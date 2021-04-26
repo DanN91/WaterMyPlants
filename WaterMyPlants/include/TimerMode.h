@@ -10,12 +10,13 @@
 
 #include <WaterPump.h>
 #include <IOperationMode.h>
-#include <PersistenceManager.h>
+
+class SettingsManager;
 
 class TimerMode final : public IOperationMode
 {
 public:
-    TimerMode(WaterPump& waterPump, PersistenceManager& persistence);
+    TimerMode(WaterPump& waterPump, SettingsManager& settings);
     ~TimerMode();
 
     // IOperationMode

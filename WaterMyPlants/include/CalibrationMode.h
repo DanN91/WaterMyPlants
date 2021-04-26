@@ -11,12 +11,12 @@
 #include <PushButtonMasks.h>
 #include <ManualMode.h>
 #include <Stopwatch.h>
-#include <PersistenceManager.h>
+#include <SettingsManager.h>
 
 class CalibrationMode final : public IObserver<ButtonState>, public IOperationMode
 {
 public:
-    CalibrationMode(WaterPump& waterPump, IObservable<ButtonState>& button, PersistenceManager& persistence);
+    CalibrationMode(WaterPump& waterPump, IObservable<ButtonState>& button, SettingsManager& settings);
     ~CalibrationMode() = default;
 
     // IObserver
@@ -28,5 +28,5 @@ public:
 private:
     ManualMode m_manualMode;
     Stopwatch m_stopwatch;
-    PersistenceManager& m_persistence;
+    SettingsManager& m_settings;
 };
