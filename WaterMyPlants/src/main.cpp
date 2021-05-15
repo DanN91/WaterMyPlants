@@ -14,10 +14,12 @@
 
 #include <OperationModeHandler.h>
 #include <RangeValuesGenerator.h>
+#include <ChangeSetting.h>
 
 #include <Menu.h>
 
 SettingsManager settingsManager;
+StringsManager stringsManager;
 
 PushButton modeChangerButton(Hardware::MODE_CHANGER_BUTTON_PIN, 3);
 PushButton executionButton(Hardware::EXECUTION_BUTTON_PIN, 3);
@@ -29,6 +31,10 @@ PushButton menuNavigationButton(Hardware::MENU_NAVIGATION_BUTTON_PIN, 1);
 SoilMoistureSensor soilMoisture(A3);
 
 MenuController menuController(display, modeChangerButton, menuNavigationButton, operationHandler);
+
+// #TODO:Move to menu controller or menu?
+MenuItem testItem(Strings::Address::TimerModeDuration, Settings::Address::TimerModeDuration);
+ChangeSetting changeSetting(display, testItem, settingsManager, stringsManager, executionButton);
 
 void setup()
 {

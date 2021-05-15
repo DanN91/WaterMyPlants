@@ -26,19 +26,25 @@ namespace Settings
         Invalid = LastOperationMode + sizeof(uint8_t)
     };
 
-    struct Limits
+    struct Range
     {
     public:
-        Limits(uint32_t min, uint32_t max) // make sure the type fits the largest limit size
+        Range(uint32_t min, uint32_t max, uint16_t step) // make sure the type fits the largest limit size
             : m_min(min),
-              m_max(max)
+              m_max(max),
+              m_step(step)
         {}
 
         bool IsInRange(uint32_t value) const { return (value >= m_min) && (value <= m_max); }
 
+        uint32_t Min() const { return m_min; }
+        uint32_t Max() const { return m_max; }
+        uint16_t Step() const { return m_step; }
+
     private:
         const uint32_t m_min = 0;
         const uint32_t m_max = 0;
+        const uint16_t m_step = 0;
     };
 
     constexpr const auto INVALID_VALUE = 9999;
@@ -53,7 +59,7 @@ public:
     uint32_t Read(Settings::Address address) const;
     bool Write(Settings::Address address, uint32_t value);
 
-    Settings::Limits GetLimits(Settings::Address address) const;
+    Settings::Range GetRange(Settings::Address address) const;
 
     // Factory reset
     void WriteDefaultSettings();

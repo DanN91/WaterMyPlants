@@ -45,7 +45,7 @@ void StringsManager::WriteAllStrings()
     }
 }
 
-String StringsManager::Get(Strings::Address stringAddress) const
+String StringsManager::Read(Strings::Address stringAddress) const
 {
     using namespace Strings;
 

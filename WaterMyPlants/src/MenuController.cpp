@@ -39,9 +39,9 @@ void MenuController::ChangeMenu(MenuCode menuCode)
     m_display.Clear();
 
     // title & separator
-    m_display.Write(0, m_stringsManager.Get(m_menu.Title()), NokiaDisplay::Aligned::Center);
+    m_display.Write(0, m_stringsManager.Read(m_menu.Title()), NokiaDisplay::Aligned::Center);
     m_display.SetCursor(1, 0);
-    m_display.Write(m_stringsManager.Get(Strings::Address::TitleSeparator));
+    m_display.Write(m_stringsManager.Read(Strings::Address::TitleSeparator));
 
     // items: text + value
     for (auto i = 0; i < m_menu.ItemsCount(); ++i)
@@ -50,7 +50,7 @@ void MenuController::ChangeMenu(MenuCode menuCode)
         if (!menuItem)
             continue;
 
-        m_display.Write(i + 2, m_stringsManager.Get(menuItem->Text()), NokiaDisplay::Aligned::Left);
+        m_display.Write(i + 2, m_stringsManager.Read(menuItem->Text()), NokiaDisplay::Aligned::Left);
         m_display.Write(i + 2, m_settingsManager.Read(menuItem->Value()), NokiaDisplay::Aligned::Right);
     }
 

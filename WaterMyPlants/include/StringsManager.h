@@ -71,7 +71,7 @@ public:
     StringsManager(Language language = Language::English);
     ~StringsManager() = default;
 
-    String Get(Strings::Address address) const;
+    String Read(Strings::Address address) const;
 
     // this should be called once and then the code commented and recompiled + reuploaded to avoid wasting EEPROM cycles
     void WriteAllStrings();

@@ -25,7 +25,6 @@ public:
 
     uint8_t ItemsCount() const;
 
-    // void Execute(uint8_t itemIndex, eButtonState buttonState) const;
     // copyable & movable
     Menu(const Menu&) = default;
     Menu& operator=(const Menu&) = default;
@@ -33,8 +32,6 @@ public:
     Menu& operator=(Menu&&) = default;
 
 private:
-    // void HandleSettingChange(uint8_t lineIndex);
-
     static constexpr uint8_t MAX_ITEMS_COUNT = 4;
     Array<MenuItem, MAX_ITEMS_COUNT> m_items;
 

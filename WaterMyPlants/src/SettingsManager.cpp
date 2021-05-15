@@ -45,7 +45,7 @@ bool SettingsManager::Write(Settings::Address address, uint32_t value)
         return false;
 
     // value check
-    if (const auto limits = GetLimits(address); (address != Address::LastOperationMode) && !limits.IsInRange(value)) // exception, because it's not set by user directly
+    if (const auto range = GetRange(address); (address != Address::LastOperationMode) && !range.IsInRange(value)) // exception, because it's not set by user directly
         return false;
 
     switch (address)
@@ -72,24 +72,24 @@ bool SettingsManager::Write(Settings::Address address, uint32_t value)
     return true;
 }
 
-Settings::Limits SettingsManager::GetLimits(Settings::Address address) const
+Settings::Range SettingsManager::GetRange(Settings::Address address) const
 {
     switch (address)
     {
         case Address::TimerModeDuration:
-            return { 1, 300 }; // 5 min
+            return { 15, 300, 15 }; // 5 min
 
         case Address::TimerModeFrequency:
-            return { 1, 7 }; // 7 days
+            return { 1, 7, 1 }; // 7 days
 
         case Address::SensorModeDry:
-            return { 5, 50 }; // #DNN:Test real-world
+            return { 5, 50, 5 }; // #DNN:Test real-world
 
         case Address::SensorModeWet:
-            return { 30, 90 };
+            return { 30, 90, 5 };
     }
 
-    return { 0, 0 };
+    return { 0, 0, 0 };
 }
 
 void SettingsManager::WriteByte(Settings::Address address, uint8_t value)
