@@ -6,6 +6,7 @@
 
 #include <Arduino.h>
 
+#include <UniquePtr.h>
 #include <ObserverPattern.h>
 
 #include <PushButton.h>
@@ -27,7 +28,7 @@ class OperationModeHandler final : public IObserver<ButtonState>
 {
 public:
     explicit OperationModeHandler(IObservable<ButtonState>& subject, PushButton& executionButton, SettingsManager& settings);
-    ~OperationModeHandler();
+    ~OperationModeHandler() = default;
 
     void Initialize() const;
     void Run();
@@ -46,7 +47,7 @@ public:
 private:
     void SetOperationMode(OperationMode operationMode);
 
-    IOperationMode* m_operation = nullptr;
+    UniquePtr<IOperationMode> m_operation;
     OperationMode m_currentMode = OperationMode::None;
 
     RangeValuesGenerator m_generator;

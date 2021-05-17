@@ -7,13 +7,16 @@
 #include <MenuCreator.h>
 #include <OperationModeHandler.h>
 
-MenuController::MenuController(NokiaDisplay& display, PushButton& modeChanger, PushButton& menuNavigation, OperationModeHandler& operationModeHandler)
+MenuController::MenuController(NokiaDisplay& display, PushButton& modeChanger, PushButton& menuNavigation, PushButton& execution, OperationModeHandler& operationModeHandler)
     : IObserver(ButtonState::Released, modeChanger)
     , m_display(display)
     , m_operationHandler(operationModeHandler)
+    , m_execution(execution)
+    , m_changeSetting(nullptr)
     , m_cursor(display, menuNavigation, '>', 0)
     , m_menu(MenuCreator::Create(GetMenuByOperationMode(m_operationHandler.CurrentMode())))
 {
+    modeChanger.Register(this);
 }
 
 void MenuController::Initialize()
@@ -30,6 +33,14 @@ void MenuController::OnEvent(ButtonState event)
 void MenuController::Handle()
 {
     m_cursor.Refresh();
+
+    // prepare item
+    static auto lastValue = m_cursor.Value();
+    if (const auto currentValue = m_cursor.Value(); m_cursor && currentValue != lastValue)
+    {
+        PrepareItemHandling(currentValue);
+        lastValue = currentValue;
+    }
 }
 
 void MenuController::ChangeMenu(MenuCode menuCode)
@@ -44,7 +55,7 @@ void MenuController::ChangeMenu(MenuCode menuCode)
     m_display.Write(m_stringsManager.Read(Strings::Address::TitleSeparator));
 
     // items: text + value
-    for (auto i = 0; i < m_menu.ItemsCount(); ++i)
+    for (uint8_t i = 0; i < m_menu.ItemsCount(); ++i)
     {
         const auto menuItem = m_menu.GetMenuItem(i);
         if (!menuItem)
@@ -56,6 +67,7 @@ void MenuController::ChangeMenu(MenuCode menuCode)
 
     // update range
     m_cursor.Range({ 0, (m_menu.ItemsCount() > 0) ? m_menu.ItemsCount() - 1 : 0 });
+    PrepareItemHandling(m_cursor.Value());
     m_cursor.Refresh(true);
 }
 
@@ -74,4 +86,10 @@ MenuCode MenuController::GetMenuByOperationMode(OperationMode operationMode) con
     }
 
     return MenuCode::None;
+}
+
+void MenuController::PrepareItemHandling(uint8_t itemIndex)
+{
+    if (const auto currentItem = m_menu.GetMenuItem(itemIndex); currentItem)
+        m_changeSetting.Reset(new ChangeSetting(m_settingsManager, *currentItem, m_execution));
 }

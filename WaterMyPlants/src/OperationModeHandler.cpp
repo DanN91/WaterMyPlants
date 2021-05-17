@@ -13,19 +13,17 @@
 // #include <SensorMode.h>
 
 OperationModeHandler::OperationModeHandler(IObservable<ButtonState>& subject, PushButton& executionButton, SettingsManager& settings)
-    : IObserver(ButtonState::Pressed, subject)
+    : IObserver(ButtonState::Released, subject)
+    , m_operation(nullptr)
     , m_generator({ 0, static_cast<uint8_t>(OperationMode::None) - 1 }, 1, settings.Read(Settings::Address::LastOperationMode), subject)
     , m_settings(settings)
     , m_waterPump(Hardware::WATER_PUMP_PIN)
     , m_executionButton(executionButton)
 {
-    SetOperationMode(static_cast<OperationMode>(m_generator.Value()));
-}
+    subject.Register(&m_generator);
+    subject.Register(this);
 
-OperationModeHandler::~OperationModeHandler()
-{
-    if (m_operation)
-        delete m_operation;
+    OnEvent(ButtonState::Released);
 }
 
 void OperationModeHandler::Initialize() const
@@ -35,33 +33,26 @@ void OperationModeHandler::Initialize() const
 
 void OperationModeHandler::SetOperationMode(OperationMode operationMode)
 {
-    // release memory for current mode
-    if (m_operation)
-    {
-        delete m_operation;
-        m_operation = nullptr;
-    }
-
     m_currentMode = operationMode;
 
-    switch (operationMode)
+    switch (m_currentMode)
     {
         case OperationMode::Manual:
         {
-            m_operation = new ManualMode(m_waterPump, m_executionButton);
+            m_operation.Reset(new ManualMode(m_waterPump, m_executionButton));
             break;
         }
 
         case OperationMode::Timer:
         {
-            m_operation = new TimerMode(m_waterPump, m_settings);
+            m_operation.Reset(new TimerMode(m_waterPump, m_settings));
             break;
         }
 
         case OperationMode::Sensor:
         {
             // #DNN:ToDo
-            m_operation = nullptr;
+            m_operation.Reset(nullptr);
             break;
         }
     }
@@ -84,6 +75,6 @@ OperationMode OperationModeHandler::CurrentMode() const
 
 void OperationModeHandler::OnEvent(ButtonState event)
 {
-    if (event == ButtonState::Pressed)
+    if (event == ButtonState::Released)
         SetOperationMode(static_cast<OperationMode>(m_generator.Value()));
 }

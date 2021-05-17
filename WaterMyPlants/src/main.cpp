@@ -1,7 +1,5 @@
 #include <Arduino.h>
 
-#include <Array.h>
-
 #include <Hardware.h>
 #include <PushButton.h>
 #include <NokiaDisplay.h>
@@ -19,22 +17,16 @@
 #include <Menu.h>
 
 SettingsManager settingsManager;
-StringsManager stringsManager;
 
-PushButton modeChangerButton(Hardware::MODE_CHANGER_BUTTON_PIN, 3);
-PushButton executionButton(Hardware::EXECUTION_BUTTON_PIN, 3);
+PushButton modeChangerButton(Hardware::MODE_CHANGER_BUTTON_PIN);
+PushButton executionButton(Hardware::EXECUTION_BUTTON_PIN);
 OperationModeHandler operationHandler(modeChangerButton, executionButton, settingsManager);
 
 NokiaDisplay display(6, 5, 4, 3, 2);
-PushButton menuNavigationButton(Hardware::MENU_NAVIGATION_BUTTON_PIN, 1);
+PushButton menuNavigationButton(Hardware::MENU_NAVIGATION_BUTTON_PIN);
+MenuController menuController(display, modeChangerButton, menuNavigationButton, executionButton, operationHandler);
 
-SoilMoistureSensor soilMoisture(A3);
-
-MenuController menuController(display, modeChangerButton, menuNavigationButton, operationHandler);
-
-// #TODO:Move to menu controller or menu?
-MenuItem testItem(Strings::Address::TimerModeDuration, Settings::Address::TimerModeDuration);
-ChangeSetting changeSetting(display, testItem, settingsManager, stringsManager, executionButton);
+SoilMoistureSensor soilMoisture(Hardware::SOIL_MOISTURE_SENSOR_PIN);
 
 void setup()
 {
@@ -47,11 +39,11 @@ void setup()
 
     operationHandler.Initialize();
 
+    // call once, then comment and recompile + upload
     // stringsManager.WriteAllStrings();
     // settingsManager.WriteDefaultSettings();
 
     display.Initialize();
-
     menuController.Initialize();
 }
 
