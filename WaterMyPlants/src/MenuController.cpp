@@ -39,24 +39,23 @@ void MenuController::Handle()
 {
     m_cursor.Refresh();
 
-    // prepare item
     static auto lastValue = m_cursor.Value();
-    if (const auto currentValue = m_cursor.Value(); m_cursor && currentValue != lastValue)
+    if (const auto currentValue = m_cursor.Value(); m_cursor && currentValue != lastValue) // prepare item only when cursor changes
     {
-        PrepareItemHandling(currentValue);
+        PrepareItemHandling();
         lastValue = currentValue;
     }
 }
 
 void MenuController::ChangeMenu(MenuCode menuCode)
 {
-    // menu
+    m_changeSetting.Reset(nullptr);
     m_menu = MenuCreator::Create(menuCode);
-    WriteMenu(m_menu);
 
     // update range
     m_cursor.Range({ 0, (m_menu.ItemsCount() > 0) ? m_menu.ItemsCount() - 1 : 0 });
-    PrepareItemHandling(m_cursor.Value());
+    PrepareItemHandling();
+    WriteMenu(m_menu);
     m_cursor.Refresh(true);
 }
 
@@ -89,8 +88,11 @@ MenuCode MenuController::GetMenuByOperationMode(uint8_t operationModeIndex) cons
     return static_cast<MenuCode>(operationModeIndex);
 }
 
-void MenuController::PrepareItemHandling(uint8_t itemIndex)
+void MenuController::PrepareItemHandling()
 {
-    if (const auto currentItem = m_menu.GetMenuItem(itemIndex); currentItem)
+    if (!m_cursor)
+        return;
+
+    if (const auto currentItem = m_menu.GetMenuItem(m_cursor.Value()))
         m_changeSetting.Reset(new ChangeSetting(m_display, m_menu, m_cursor.Value(), m_execution));
 }

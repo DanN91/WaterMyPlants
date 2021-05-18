@@ -42,7 +42,7 @@ private:
     void WriteMenuItem(uint8_t itemIndex) const;
     MenuCode GetMenuByOperationMode(uint8_t operationMode) const;
 
-    void PrepareItemHandling(uint8_t itemIndex);
+    void PrepareItemHandling();
 
     SettingsManager m_settingsManager;
     StringsManager m_stringsManager;

@@ -45,6 +45,9 @@ void ChangeSetting::OnEvent(ButtonState event)
 void ChangeSetting::UpdateItem(uint32_t value)
 {
     const uint8_t itemLineIndex = 2 + m_itemIndex;
+
+    m_display.SetCursor(itemLineIndex, 0);
+    m_display.ClearLine();
     m_display.Write(itemLineIndex, m_strings.Read(m_menuItem.Text()), NokiaDisplay::Aligned::Left);
     m_display.Write(itemLineIndex, value, NokiaDisplay::Aligned::Right);
 }

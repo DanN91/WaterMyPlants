@@ -48,5 +48,8 @@ void ManualMode::Activate()
 
 void ManualMode::Deactivate()
 {
+    if (m_waterPump.IsOn())
+        m_waterPump.TurnOff();
+
     Unregister();
 }
