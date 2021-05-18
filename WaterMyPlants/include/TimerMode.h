@@ -21,13 +21,13 @@ public:
 
     // IOperationMode
     void Run() override;
+    void Activate() override;
+    void Deactivate() override;
 
 private:
     WaterPump& m_waterPump;
+    SettingsManager& m_settings;
 
     uint32_t m_startedWateringAtMs = 0;
     uint32_t m_timeToWaterCounterMs = 0;
-
-    const uint16_t WATERING_DURATION_SEC = 0;
-    const uint8_t WATERING_FREQUENCY_DAYS = 0;
 };
