@@ -38,7 +38,7 @@ public:
 
 private:
     void ChangeMenu(MenuCode menuCode);
-    MenuCode GetMenuByOperationMode(OperationMode operationMode) const;
+    MenuCode GetMenuByOperationMode(uint8_t operationMode) const;
     void PrepareItemHandling(uint8_t itemIndex);
 
     SettingsManager m_settingsManager;

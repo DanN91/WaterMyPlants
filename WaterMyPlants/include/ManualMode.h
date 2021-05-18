@@ -21,6 +21,8 @@ public:
 
     // IOperationMode
     void Run() override;
+    void Activate() override;
+    void Deactivate() override;
 
 private:
     WaterPump& m_waterPump;

@@ -13,6 +13,8 @@ public:
     virtual ~IOperationMode() = default;
 
     virtual void Run() = 0;
+    virtual void Activate() {}
+    virtual void Deactivate() {}
 
 protected:
     // non-copyable & non-movable

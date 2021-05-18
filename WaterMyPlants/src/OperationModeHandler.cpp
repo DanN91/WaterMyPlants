@@ -1,80 +1,67 @@
 /*
-    ...
+    OperationModeHandler: iterates through available operation modes whenever the observed push button is released.
+    Author: Daniel Nistor
+    MIT License, 2021
 */
-
 #include "OperationModeHandler.h"
 
-#include <Hardware.h>
-#include <SettingsManager.h>
-
-#include <IOperationMode.h>
-#include <ManualMode.h>
-#include <TimerMode.h>
-// #include <SensorMode.h>
-
-OperationModeHandler::OperationModeHandler(IObservable<ButtonState>& subject, PushButton& executionButton, SettingsManager& settings)
+OperationModeHandler::OperationModeHandler(IObservable<ButtonState>& subject, SettingsManager& settings)
     : IObserver(ButtonState::Released, subject)
-    , m_operation(nullptr)
-    , m_generator({ 0, static_cast<uint8_t>(OperationMode::None) - 1 }, 1, settings.Read(Settings::Address::LastOperationMode), subject)
+    , m_currentModeIndex(settings.Read(Settings::Address::LastOperationMode))
+    , m_generator({ 0, 0 }, 1, m_currentModeIndex, subject) // range is set in Initialize, after operation modes have been added
     , m_settings(settings)
-    , m_waterPump(Hardware::WATER_PUMP_PIN)
-    , m_executionButton(executionButton)
 {
     subject.Register(&m_generator);
     subject.Register(this);
+}
 
+void OperationModeHandler::Initialize()
+{
     OnEvent(ButtonState::Released);
-}
-
-void OperationModeHandler::Initialize() const
-{
-    m_waterPump.Initialize();
-}
-
-void OperationModeHandler::SetOperationMode(OperationMode operationMode)
-{
-    m_currentMode = operationMode;
-
-    switch (m_currentMode)
-    {
-        case OperationMode::Manual:
-        {
-            m_operation.Reset(new ManualMode(m_waterPump, m_executionButton));
-            break;
-        }
-
-        case OperationMode::Timer:
-        {
-            m_operation.Reset(new TimerMode(m_waterPump, m_settings));
-            break;
-        }
-
-        case OperationMode::Sensor:
-        {
-            // #DNN:ToDo
-            m_operation.Reset(nullptr);
-            break;
-        }
-    }
-
-    m_settings.Write(Settings::Address::LastOperationMode, static_cast<uint8_t>(operationMode));
 }
 
 void OperationModeHandler::Run()
 {
-    m_executionButton.HandleEvents();
-
-    if (m_operation)
-        m_operation->Run();
+    if (const auto currentMode = m_operationModes[m_currentModeIndex])
+        (*currentMode)->Run();
 }
 
-OperationMode OperationModeHandler::CurrentMode() const
+void OperationModeHandler::Add(IOperationMode& operationMode)
 {
-    return m_currentMode;
+    m_operationModes.Add(&operationMode);
+    UpdateRange();
+}
+
+void OperationModeHandler::Remove(uint8_t index)
+{
+    m_operationModes.Remove(index);
+    UpdateRange();
+}
+
+void OperationModeHandler::SetOperationMode(uint8_t operationModeIndex)
+{
+    if (const auto currentMode = m_operationModes[m_currentModeIndex]) // deactivate previous
+        (*currentMode)->Deactivate();
+
+    if (const auto nextMode = m_operationModes[operationModeIndex]) // activate current
+        (*nextMode)->Activate();
+
+    m_currentModeIndex = operationModeIndex;
+    m_settings.Write(Settings::Address::LastOperationMode, m_currentModeIndex);
+}
+
+uint8_t OperationModeHandler::CurrentModeIndex() const
+{
+    return m_currentModeIndex;
 }
 
 void OperationModeHandler::OnEvent(ButtonState event)
 {
     if (event == ButtonState::Released)
-        SetOperationMode(static_cast<OperationMode>(m_generator.Value()));
+        SetOperationMode(m_generator.Value());
+}
+
+void OperationModeHandler::UpdateRange()
+{
+    m_generator.Range({ 0, m_operationModes.Size() ? (m_operationModes.Size() - 1) : 0 });
 }

@@ -14,7 +14,7 @@ MenuController::MenuController(NokiaDisplay& display, PushButton& modeChanger, P
     , m_execution(execution)
     , m_changeSetting(nullptr)
     , m_cursor(display, menuNavigation, '>', 0)
-    , m_menu(MenuCreator::Create(GetMenuByOperationMode(m_operationHandler.CurrentMode())))
+    , m_menu(MenuCreator::Create(GetMenuByOperationMode(m_operationHandler.CurrentModeIndex())))
 {
     modeChanger.Register(this);
 }
@@ -27,7 +27,7 @@ void MenuController::Initialize()
 void MenuController::OnEvent(ButtonState event)
 {
     if (event == ButtonState::Released)
-        ChangeMenu(GetMenuByOperationMode(m_operationHandler.CurrentMode()));
+        ChangeMenu(GetMenuByOperationMode(m_operationHandler.CurrentModeIndex()));
 }
 
 void MenuController::Handle()
@@ -71,21 +71,9 @@ void MenuController::ChangeMenu(MenuCode menuCode)
     m_cursor.Refresh(true);
 }
 
-MenuCode MenuController::GetMenuByOperationMode(OperationMode operationMode) const
+MenuCode MenuController::GetMenuByOperationMode(uint8_t operationModeIndex) const
 {
-    switch (operationMode)
-    {
-        case OperationMode::Manual:
-            return MenuCode::Manual;
-
-        case OperationMode::Timer:
-            return MenuCode::Timer;
-
-        case OperationMode::Sensor:
-            return MenuCode::Sensor;
-    }
-
-    return MenuCode::None;
+    return static_cast<MenuCode>(operationModeIndex);
 }
 
 void MenuController::PrepareItemHandling(uint8_t itemIndex)

@@ -1,39 +1,35 @@
 /*
-    ...
+    OperationModeHandler: iterates through available operation modes whenever the observed push button is released.
+    Author: Daniel Nistor
+    MIT License, 2021
 */
-
 #pragma once
 
 #include <Arduino.h>
 
-#include <UniquePtr.h>
+#include <Vector.h>
 #include <ObserverPattern.h>
 
 #include <PushButton.h>
 #include <RangeValuesGenerator.h>
-#include <WaterPump.h>
 
-class SettingsManager;
-class IOperationMode;
-
-enum class OperationMode : uint8_t
-{
-    Manual = 0,
-    Timer,
-    Sensor,
-    None, // this should be last
-};
+#include <SettingsManager.h>
+#include <IOperationMode.h>
 
 class OperationModeHandler final : public IObserver<ButtonState>
 {
 public:
-    explicit OperationModeHandler(IObservable<ButtonState>& subject, PushButton& executionButton, SettingsManager& settings);
+    explicit OperationModeHandler(IObservable<ButtonState>& subject, SettingsManager& settings);
     ~OperationModeHandler() = default;
 
-    void Initialize() const;
+    void Initialize();
     void Run();
 
-    OperationMode CurrentMode() const;
+    void Add(IOperationMode& operationMode);
+    void Remove(uint8_t index);
+
+    void SetOperationMode(uint8_t operationModeIndex);
+    uint8_t CurrentModeIndex() const;
 
     // IObserver
     void OnEvent(ButtonState event) override;
@@ -45,15 +41,11 @@ public:
     OperationModeHandler& operator=(OperationModeHandler&&) = delete;
 
 private:
-    void SetOperationMode(OperationMode operationMode);
+    void UpdateRange();
 
-    UniquePtr<IOperationMode> m_operation;
-    OperationMode m_currentMode = OperationMode::None;
+    Vector<IOperationMode*> m_operationModes;
+    uint8_t m_currentModeIndex = 0;
 
     RangeValuesGenerator m_generator;
     SettingsManager& m_settings;
-
-    // hardware
-    WaterPump m_waterPump;
-    PushButton& m_executionButton;
 };
