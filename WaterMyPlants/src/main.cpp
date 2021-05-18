@@ -37,6 +37,7 @@ TimerMode timerMode(waterPump, settingsManager);
 
 SoilMoistureSensor soilMoisture(Hardware::SOIL_MOISTURE_SENSOR_PIN);
 
+
 void setup()
 {
     Serial.begin(9600);

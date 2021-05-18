@@ -1,7 +1,8 @@
 /*
-    ...
+    ChangeSetting: allows user interaction for changing the value of a setting and storing it into persistence.
+    Author: Daniel Nistor
+    MIT License, 2021
 */
-
 #pragma once
 
 #include <Arduino.h>
@@ -10,14 +11,17 @@
 #include <PushButtonMasks.h>
 #include <MenuItem.h>
 #include <RangeValuesGenerator.h>
+#include <SettingsManager.h>
+#include <StringsManager.h>
 
-class SettingsManager;
+class NokiaDisplay;
+class Menu;
 
 class ChangeSetting final : public IObserver<ButtonState>
 {
 public:
-    ChangeSetting(SettingsManager& settings, const MenuItem& item, IObservable<ButtonState>& button);
-    ~ChangeSetting() = default;
+    ChangeSetting(NokiaDisplay& display, const Menu& menu, uint8_t itemIndex, IObservable<ButtonState>& button);
+    ~ChangeSetting();
 
     // IObserver
     void OnEvent(ButtonState event);
@@ -29,7 +33,14 @@ public:
     ChangeSetting& operator=(ChangeSetting&&) = delete;
 
 private:
-    const MenuItem& m_item;
-    SettingsManager& m_settings;
+    void UpdateItem(uint32_t value);
+
+    SettingsManager m_settings;
+    StringsManager m_strings;
+
+    const uint8_t m_itemIndex;
+    const MenuItem& m_menuItem;
+
     RangeValuesGenerator m_generator;
+    NokiaDisplay& m_display;
 };

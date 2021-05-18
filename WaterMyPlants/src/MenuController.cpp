@@ -7,6 +7,11 @@
 #include <MenuCreator.h>
 #include <OperationModeHandler.h>
 
+namespace
+{
+    constexpr const uint8_t LINE_OFFSET = 2;
+} // anonymous
+
 MenuController::MenuController(NokiaDisplay& display, PushButton& modeChanger, PushButton& menuNavigation, PushButton& execution, OperationModeHandler& operationModeHandler)
     : IObserver(ButtonState::Released, modeChanger)
     , m_display(display)
@@ -45,8 +50,18 @@ void MenuController::Handle()
 
 void MenuController::ChangeMenu(MenuCode menuCode)
 {
+    // menu
     m_menu = MenuCreator::Create(menuCode);
+    WriteMenu(m_menu);
 
+    // update range
+    m_cursor.Range({ 0, (m_menu.ItemsCount() > 0) ? m_menu.ItemsCount() - 1 : 0 });
+    PrepareItemHandling(m_cursor.Value());
+    m_cursor.Refresh(true);
+}
+
+void MenuController::WriteMenu(Menu& menu) const
+{
     m_display.Clear();
 
     // title & separator
@@ -56,19 +71,17 @@ void MenuController::ChangeMenu(MenuCode menuCode)
 
     // items: text + value
     for (uint8_t i = 0; i < m_menu.ItemsCount(); ++i)
+        WriteMenuItem(i);
+}
+
+void MenuController::WriteMenuItem(uint8_t itemIndex) const
+{
+    if (const auto menuItem = m_menu.GetMenuItem(itemIndex))
     {
-        const auto menuItem = m_menu.GetMenuItem(i);
-        if (!menuItem)
-            continue;
-
-        m_display.Write(i + 2, m_stringsManager.Read(menuItem->Text()), NokiaDisplay::Aligned::Left);
-        m_display.Write(i + 2, m_settingsManager.Read(menuItem->Value()), NokiaDisplay::Aligned::Right);
+        const uint8_t itemLineIndex = LINE_OFFSET + itemIndex;
+        m_display.Write(itemLineIndex, m_stringsManager.Read(menuItem->Text()), NokiaDisplay::Aligned::Left);
+        m_display.Write(itemLineIndex, m_settingsManager.Read(menuItem->Value()), NokiaDisplay::Aligned::Right);
     }
-
-    // update range
-    m_cursor.Range({ 0, (m_menu.ItemsCount() > 0) ? m_menu.ItemsCount() - 1 : 0 });
-    PrepareItemHandling(m_cursor.Value());
-    m_cursor.Refresh(true);
 }
 
 MenuCode MenuController::GetMenuByOperationMode(uint8_t operationModeIndex) const
@@ -79,5 +92,5 @@ MenuCode MenuController::GetMenuByOperationMode(uint8_t operationModeIndex) cons
 void MenuController::PrepareItemHandling(uint8_t itemIndex)
 {
     if (const auto currentItem = m_menu.GetMenuItem(itemIndex); currentItem)
-        m_changeSetting.Reset(new ChangeSetting(m_settingsManager, *currentItem, m_execution));
+        m_changeSetting.Reset(new ChangeSetting(m_display, m_menu, m_cursor.Value(), m_execution));
 }

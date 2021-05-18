@@ -1,24 +1,50 @@
 /*
-    ...
+    ChangeSetting: allows user interaction for changing the value of a setting and storing it into persistence.
+    Author: Daniel Nistor
+    MIT License, 2021
 */
-
 #include "ChangeSetting.h"
 
-#include <SettingsManager.h>
+#include <NokiaDisplay.h>
+#include <Menu.h>
 
-ChangeSetting::ChangeSetting(SettingsManager& settings, const MenuItem& item, IObservable<ButtonState>& button)
-    : IObserver(ButtonState::Held, button)
-    , m_item(item)
-    , m_settings(settings)
-    , m_generator({ m_settings.GetRange(m_item.Value()).Min(), m_settings.GetRange(m_item.Value()).Max() }, m_settings.GetRange(m_item.Value()).Step(), m_settings.Read(m_item.Value()), button, ButtonState::Released)
+ChangeSetting::ChangeSetting(NokiaDisplay& display, const Menu& menu, uint8_t itemIndex, IObservable<ButtonState>& button)
+    : IObserver(ButtonState::Released | ButtonState::Held, button)
+    , m_itemIndex(itemIndex)
+    , m_menuItem(*menu.GetMenuItem(m_itemIndex))
+    , m_generator({ m_settings.GetRange(m_menuItem.Value()).Min(), m_settings.GetRange(m_menuItem.Value()).Max() }, m_settings.GetRange(m_menuItem.Value()).Step(), m_settings.Read(m_menuItem.Value()), button, ButtonState::Released)
+    , m_display(display)
 {
-    // lazy registering for better ordering flexibility
     button.Register(&m_generator);
     button.Register(this);
 }
 
+ChangeSetting::~ChangeSetting()
+{
+    UpdateItem(m_settings.Read(m_menuItem.Value()));
+}
+
 void ChangeSetting::OnEvent(ButtonState event)
 {
-    if (event == ButtonState::Held)
-        m_settings.Write(m_item.Value(), m_generator.Value());
+    switch (event)
+    {
+        case ButtonState::Released:
+        {
+            UpdateItem(m_generator.Value());
+            break;
+        }
+
+        case ButtonState::Held:
+        {
+            m_settings.Write(m_menuItem.Value(), m_generator.Value());
+            break;
+        }
+    }
+}
+
+void ChangeSetting::UpdateItem(uint32_t value)
+{
+    const uint8_t itemLineIndex = 2 + m_itemIndex;
+    m_display.Write(itemLineIndex, m_strings.Read(m_menuItem.Text()), NokiaDisplay::Aligned::Left);
+    m_display.Write(itemLineIndex, value, NokiaDisplay::Aligned::Right);
 }
