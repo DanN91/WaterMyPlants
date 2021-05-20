@@ -31,6 +31,7 @@ namespace Strings
         // Sensor Mode
         constexpr const auto SENSOR_MODE_DRY = "Dry";
         constexpr const auto SENSOR_MODE_WET = "Wet";
+        constexpr const auto SENSOR_MODE_LIGHT_THRESHOLD = "Light";
     }
 
     namespace ROM
@@ -53,9 +54,10 @@ namespace Strings
         // Sensor Mode
         SensorModeDry = TimerModeFrequency + strlen(ENU::TIMER_MODE_CALIBRATION_FREQUENCY) + SPACE_BETWEEN_STRINGS,
         SensorModeWet = SensorModeDry + strlen(ENU::SENSOR_MODE_DRY) + SPACE_BETWEEN_STRINGS,
+        SensorModeLightThreshold = SensorModeWet + strlen(ENU::SENSOR_MODE_WET) + SPACE_BETWEEN_STRINGS,
 
         // Not found, invalid address
-        Invalid = SensorModeWet + strlen(ENU::SENSOR_MODE_WET) + SPACE_BETWEEN_STRINGS, // empty ""
+        Invalid = SensorModeLightThreshold + strlen(ENU::SENSOR_MODE_LIGHT_THRESHOLD) + SPACE_BETWEEN_STRINGS, // empty ""
     };
 }
 

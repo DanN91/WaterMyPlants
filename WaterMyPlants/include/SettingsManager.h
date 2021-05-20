@@ -20,7 +20,8 @@ namespace Settings
         TimerModeFrequency = TimerModeDuration + sizeof(uint16_t),
         SensorModeDry = TimerModeFrequency + sizeof(uint8_t),
         SensorModeWet = SensorModeDry + sizeof(uint8_t),
-        LastOperationMode = SensorModeWet + sizeof(uint8_t),
+        SensorModeLightThreshold = SensorModeWet + sizeof(uint8_t),
+        LastOperationMode = SensorModeLightThreshold + sizeof(uint8_t),
 
         // Not found, invalid address
         Invalid = LastOperationMode + sizeof(uint8_t)

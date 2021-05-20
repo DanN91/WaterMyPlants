@@ -17,6 +17,7 @@ void SettingsManager::WriteDefaultSettings()
     Write(Address::LastOperationMode, 0); // Manual mode
     Write(Address::SensorModeDry, 20); // 20 %
     Write(Address::SensorModeWet, 70); // 70 %
+    Write(Address::SensorModeLightThreshold, 10); // 10 %
 }
 
 uint32_t SettingsManager::Read(Settings::Address address) const
@@ -29,6 +30,7 @@ uint32_t SettingsManager::Read(Settings::Address address) const
         case Address::TimerModeFrequency: 
         case Address::SensorModeDry:
         case Address::SensorModeWet:
+        case Address::SensorModeLightThreshold:
         case Address::LastOperationMode:
             return ReadByte(address);
 
@@ -59,6 +61,7 @@ bool SettingsManager::Write(Settings::Address address, uint32_t value)
         case Address::TimerModeFrequency: 
         case Address::SensorModeDry:
         case Address::SensorModeWet:
+        case Address::SensorModeLightThreshold:
         case Address::LastOperationMode:
         {
             WriteByte(address, value);
@@ -87,6 +90,9 @@ Settings::Range SettingsManager::GetRange(Settings::Address address) const
 
         case Address::SensorModeWet:
             return { 30, 90, 5 };
+
+        case Address::SensorModeLightThreshold:
+            return { 0, 100, 5 };
     }
 
     return { 0, 0, 0 };

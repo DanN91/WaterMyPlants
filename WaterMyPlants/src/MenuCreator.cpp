@@ -38,6 +38,7 @@ Menu MenuCreator::Create(MenuCode menuCode)
 
             menu.AddMenuItem({ Strings::Address::SensorModeDry, Settings::Address::SensorModeDry });
             menu.AddMenuItem({ Strings::Address::SensorModeWet, Settings::Address::SensorModeWet });
+            menu.AddMenuItem({ Strings::Address::SensorModeLightThreshold, Settings::Address::SensorModeLightThreshold });
             break;
         }
     }

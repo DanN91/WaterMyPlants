@@ -37,6 +37,7 @@ void StringsManager::WriteAllStrings()
         // Sensor Mode
         Write(Address::SensorModeDry, ENU::SENSOR_MODE_DRY);
         Write(Address::SensorModeWet, ENU::SENSOR_MODE_WET);
+        Write(Address::SensorModeLightThreshold, ENU::SENSOR_MODE_LIGHT_THRESHOLD);
     }
 
     // ROM

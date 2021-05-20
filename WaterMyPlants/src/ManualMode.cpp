@@ -12,7 +12,7 @@ namespace
 } // anonymous
 
 ManualMode::ManualMode(WaterPump& waterPump, IObservable<ButtonState>& button)
-    : IObserver<ButtonState>(ButtonState::Released, button)
+    : IObserver(ButtonState::Released, button)
     , m_waterPump(waterPump)
 {
 }

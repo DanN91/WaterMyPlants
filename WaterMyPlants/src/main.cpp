@@ -8,7 +8,9 @@
 #include <MenuController.h>
 #include <SettingsManager.h>
 #include <StringsManager.h>
+
 #include <SoilMoistureSensor.h>
+#include <LightSensor.h>
 
 #include <OperationModeHandler.h>
 #include <RangeValuesGenerator.h>
@@ -16,6 +18,7 @@
 
 #include <ManualMode.h>
 #include <TimerMode.h>
+#include <SensorMode.h>
 
 #include <Menu.h>
 
@@ -35,8 +38,9 @@ ManualMode manualMode(waterPump, executionButton);
 
 TimerMode timerMode(waterPump, settingsManager);
 
-SoilMoistureSensor soilMoisture(Hardware::SOIL_MOISTURE_SENSOR_PIN);
-
+SoilMoistureSensor soilMoistureSensor(Hardware::SOIL_MOISTURE_SENSOR_PIN, SoilMoistureSensor::Sensitivity::Medium);
+LightSensor lightSensor(Hardware::LIGHT_SENSOR_PIN, LightSensor::Sensitivity::High);
+SensorMode sensorMode(soilMoistureSensor, lightSensor, waterPump, settingsManager);
 
 void setup()
 {
@@ -45,6 +49,7 @@ void setup()
     // Operation Mode Handler
     operationHandler.Add(manualMode);
     operationHandler.Add(timerMode);
+    operationHandler.Add(sensorMode);
 
     operationHandler.Initialize();
 
@@ -55,6 +60,7 @@ void setup()
     waterPump.Initialize();
 
     // call once, then comment and recompile + upload
+    // StringsManager stringsManager;
     // stringsManager.WriteAllStrings();
     // settingsManager.WriteDefaultSettings();
 
@@ -70,18 +76,34 @@ void loop()
     modeChangerButton.HandleEvents();
     menuNavigationButton.HandleEvents();
     executionButton.HandleEvents();
+    lightSensor.HandleEvents();
+    soilMoistureSensor.HandleEvents();
 
     operationHandler.Run();
     menuController.Handle();
 
-    if ((millis() - previous) >= 1000) // once every second
+    if ((millis() - previous) >= 1500) // once every second
     {
-        Serial.print(soilMoisture.Value());
-        Serial.println(" %");
+        const auto PrintSensorValues = [](const char* name, uint16_t rawValue, uint8_t percentValue){
+            Serial.print(name);
+            Serial.print(rawValue);
+            Serial.print(" ( ");
+            Serial.print(percentValue);
+            Serial.println(" % )");
+        };
+
+        const auto lightValue = lightSensor.RawValue();
+        // const auto lightPercent = lightSensor.Value();
+        // PrintSensorValues("Light: ", lightValue, lightPercent);
+
+        const auto moistureValue = soilMoistureSensor.RawValue();
+        // const auto moisturePercent = soilMoistureSensor.Value();
+        // PrintSensorValues("Moisture: ", moistureValue, moisturePercent);
 
         display.SetCursor(5, 0);
         display.ClearLine();
-        display.Write(5, soilMoisture.Value(), NokiaDisplay::Aligned::Center);
+        display.Write(5, moistureValue, NokiaDisplay::Aligned::Left);
+        display.Write(5, lightValue, NokiaDisplay::Aligned::Right);
 
         previous = millis();
     }

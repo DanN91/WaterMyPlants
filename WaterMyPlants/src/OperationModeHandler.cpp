@@ -63,5 +63,5 @@ void OperationModeHandler::OnEvent(ButtonState event)
 
 void OperationModeHandler::UpdateRange()
 {
-    m_generator.Range({ 0, m_operationModes.Size() ? (m_operationModes.Size() - 1) : 0 });
+    m_generator.Range({ 0, m_operationModes.Size() ? (m_operationModes.Size() - 1) : 0 }, m_currentModeIndex);
 }
