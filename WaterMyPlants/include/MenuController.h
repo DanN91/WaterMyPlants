@@ -9,7 +9,7 @@
 #include <ObserverPattern.h>
 #include <PushButton.h>
 
-#include <Menu.h>
+#include <IMenu.h>
 #include <MenuCursor.h>
 #include <MenuCreator.h>
 
@@ -38,13 +38,12 @@ public:
 
 private:
     void ChangeMenu(MenuCode menuCode);
-    void WriteMenu(Menu& menu) const;
+    void WriteMenu(IMenu& menu) const;
     void WriteMenuItem(uint8_t itemIndex) const;
     MenuCode GetMenuByOperationMode(uint8_t operationMode) const;
 
     void PrepareItemHandling();
 
-    SettingsManager m_settingsManager;
     StringsManager m_stringsManager;
     NokiaDisplay& m_display;
     OperationModeHandler& m_operationHandler;
@@ -53,5 +52,5 @@ private:
     UniquePtr<ChangeSetting> m_changeSetting;
 
     MenuCursor m_cursor;
-    Menu m_menu;
+    UniquePtr<IMenu> m_menu;
 };

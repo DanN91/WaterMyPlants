@@ -20,7 +20,7 @@ void SettingsManager::WriteDefaultSettings()
     Write(Address::SensorModeLightThreshold, 10); // 10 %
 }
 
-uint32_t SettingsManager::Read(Settings::Address address) const
+uint32_t SettingsManager::Read(Settings::Address address)
 {
     switch (address)
     {
@@ -75,7 +75,7 @@ bool SettingsManager::Write(Settings::Address address, uint32_t value)
     return true;
 }
 
-Settings::Range SettingsManager::GetRange(Settings::Address address) const
+Settings::Range SettingsManager::GetRange(Settings::Address address)
 {
     switch (address)
     {
@@ -92,7 +92,7 @@ Settings::Range SettingsManager::GetRange(Settings::Address address) const
             return { 30, 90, 5 };
 
         case Address::SensorModeLightThreshold:
-            return { 0, 100, 5 };
+            return { 10, 90, 5 };
     }
 
     return { 0, 0, 0 };
@@ -103,7 +103,7 @@ void SettingsManager::WriteByte(Settings::Address address, uint8_t value)
     EEPROM[static_cast<uint8_t>(address)] = value;
 }
 
-uint8_t SettingsManager::ReadByte(Settings::Address address) const
+uint8_t SettingsManager::ReadByte(Settings::Address address)
 {
     return EEPROM[static_cast<uint16_t>(address)];
 }
@@ -113,7 +113,7 @@ void SettingsManager::WriteShort(Settings::Address address, uint16_t value)
     EEPROM.put<uint16_t>(static_cast<uint16_t>(address), value);
 }
 
-uint16_t SettingsManager::ReadShort(Settings::Address address) const
+uint16_t SettingsManager::ReadShort(Settings::Address address)
 {
     uint16_t value = 0;
     EEPROM.get<uint16_t>(static_cast<uint16_t>(address), value);

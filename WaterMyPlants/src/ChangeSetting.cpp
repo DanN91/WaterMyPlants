@@ -8,11 +8,12 @@
 #include <NokiaDisplay.h>
 #include <Menu.h>
 
-ChangeSetting::ChangeSetting(NokiaDisplay& display, const Menu& menu, uint8_t itemIndex, IObservable<ButtonState>& button)
+ChangeSetting::ChangeSetting(NokiaDisplay& display, const IMenu& menu, uint8_t itemIndex, IObservable<ButtonState>& button)
     : IObserver(ButtonState::Released | ButtonState::Held, button)
     , m_itemIndex(itemIndex)
     , m_menuItem(*menu.GetMenuItem(m_itemIndex))
-    , m_generator({ m_settings.GetRange(m_menuItem.Value()).Min(), m_settings.GetRange(m_menuItem.Value()).Max() }, m_settings.GetRange(m_menuItem.Value()).Step(), m_settings.Read(m_menuItem.Value()), button, ButtonState::Released)
+    , m_address(reinterpret_cast<const SettingMenuItem*>(&m_menuItem)->Address())
+    , m_generator({ SettingsManager::GetRange(m_address).Min(), SettingsManager::GetRange(m_address).Max() }, SettingsManager::GetRange(m_address).Step(), SettingsManager::Read(m_address), button, ButtonState::Released)
     , m_display(display)
 {
     button.Register(&m_generator);
@@ -21,7 +22,7 @@ ChangeSetting::ChangeSetting(NokiaDisplay& display, const Menu& menu, uint8_t it
 
 ChangeSetting::~ChangeSetting()
 {
-    UpdateItem(m_settings.Read(m_menuItem.Value()));
+    UpdateItem(m_menuItem.Value());
 }
 
 void ChangeSetting::OnEvent(ButtonState event)
@@ -36,7 +37,7 @@ void ChangeSetting::OnEvent(ButtonState event)
 
         case ButtonState::Held:
         {
-            m_settings.Write(m_menuItem.Value(), m_generator.Value());
+            SettingsManager::Write(m_address, m_generator.Value());
             break;
         }
     }
@@ -48,6 +49,6 @@ void ChangeSetting::UpdateItem(uint32_t value)
 
     m_display.SetCursor(itemLineIndex, 0);
     m_display.ClearLine();
-    m_display.Write(itemLineIndex, m_strings.Read(m_menuItem.Text()), NokiaDisplay::Aligned::Left);
+    m_display.Write(itemLineIndex, m_menuItem.Text(), NokiaDisplay::Aligned::Left);
     m_display.Write(itemLineIndex, value, NokiaDisplay::Aligned::Right);
 }

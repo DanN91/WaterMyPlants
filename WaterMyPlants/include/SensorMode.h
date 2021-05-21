@@ -18,7 +18,7 @@ class SettingsManager;
 class SensorMode final : public IOperationMode, public IObserver<SoilMoistureEvent>, public IObserver<LightSensorEvent>
 {
 public:
-    SensorMode(SoilMoistureSensor& soilMoistureSensor, LightSensor& lightSensor, WaterPump& waterPump, SettingsManager& settings);
+    SensorMode(SoilMoistureSensor& soilMoistureSensor, LightSensor& lightSensor, WaterPump& waterPump);
     ~SensorMode();
 
     // IObserver
@@ -46,7 +46,6 @@ private:
     uint32_t m_startedAtMs = 0;
     uint32_t m_stoppedAtMs = 0;
 
-    SettingsManager& m_settings;
     SoilMoistureSensor& m_soilMoistureSensor;
     LightSensor& m_lightSensor;
     WaterPump& m_waterPump;

@@ -23,6 +23,7 @@ namespace Strings
         constexpr const auto MANUAL_MODE_TITLE = "Manual";
         constexpr const auto TIMER_MODE_TITLE = "Timer";
         constexpr const auto SENSOR_MODE_TITLE = "Sensor";
+        constexpr const auto MONITOR_MODE_TITLE = "Monitor";
 
         // Timer Mode
         constexpr const auto TIMER_MODE_CALIBRATION_DURATION = "Duration";
@@ -46,9 +47,10 @@ namespace Strings
         ManualModeTitle = TitleSeparator + strlen(SEPARATOR) + SPACE_BETWEEN_STRINGS,
         TimerModeTitle = ManualModeTitle + strlen(ENU::MANUAL_MODE_TITLE) + SPACE_BETWEEN_STRINGS,
         SensorModeTitle = TimerModeTitle + strlen(ENU::TIMER_MODE_TITLE) + SPACE_BETWEEN_STRINGS,
+        MonitorModeTitle = SensorModeTitle + strlen(ENU::SENSOR_MODE_TITLE) + SPACE_BETWEEN_STRINGS,
 
         // Timer Mode
-        TimerModeDuration = SensorModeTitle + strlen(ENU::SENSOR_MODE_TITLE) + SPACE_BETWEEN_STRINGS,
+        TimerModeDuration = MonitorModeTitle + strlen(ENU::MONITOR_MODE_TITLE) + SPACE_BETWEEN_STRINGS,
         TimerModeFrequency = TimerModeDuration + strlen(ENU::TIMER_MODE_CALIBRATION_DURATION) + SPACE_BETWEEN_STRINGS,
 
         // Sensor Mode

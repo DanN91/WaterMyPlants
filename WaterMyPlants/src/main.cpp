@@ -6,7 +6,6 @@
 #include <MenuCursor.h>
 #include <MenuCreator.h>
 #include <MenuController.h>
-#include <SettingsManager.h>
 #include <StringsManager.h>
 
 #include <SoilMoistureSensor.h>
@@ -22,25 +21,23 @@
 
 #include <Menu.h>
 
-SettingsManager settingsManager;
-
 PushButton modeChangerButton(Hardware::MODE_CHANGER_BUTTON_PIN);
-PushButton executionButton(Hardware::EXECUTION_BUTTON_PIN);
-OperationModeHandler operationHandler(modeChangerButton, settingsManager);
+OperationModeHandler operationHandler(modeChangerButton);
 
 NokiaDisplay display(6, 5, 4, 3, 2);
 PushButton menuNavigationButton(Hardware::MENU_NAVIGATION_BUTTON_PIN);
+PushButton executionButton(Hardware::EXECUTION_BUTTON_PIN);
 MenuController menuController(display, modeChangerButton, menuNavigationButton, executionButton, operationHandler);
 
 // Operation Modes
 WaterPump waterPump(Hardware::WATER_PUMP_PIN);
 ManualMode manualMode(waterPump, executionButton);
 
-TimerMode timerMode(waterPump, settingsManager);
+TimerMode timerMode(waterPump);
 
 SoilMoistureSensor soilMoistureSensor(Hardware::SOIL_MOISTURE_SENSOR_PIN, SoilMoistureSensor::Sensitivity::Medium);
 LightSensor lightSensor(Hardware::LIGHT_SENSOR_PIN, LightSensor::Sensitivity::High);
-SensorMode sensorMode(soilMoistureSensor, lightSensor, waterPump, settingsManager);
+SensorMode sensorMode(soilMoistureSensor, lightSensor, waterPump);
 
 void setup()
 {
@@ -50,6 +47,7 @@ void setup()
     operationHandler.Add(manualMode);
     operationHandler.Add(timerMode);
     operationHandler.Add(sensorMode);
+    // operationHandler.Add(monitorMode);
 
     operationHandler.Initialize();
 
@@ -60,8 +58,8 @@ void setup()
     waterPump.Initialize();
 
     // call once, then comment and recompile + upload
-    // StringsManager stringsManager;
-    // stringsManager.WriteAllStrings();
+    //StringsManager stringsManager;
+    //stringsManager.WriteAllStrings();
     // settingsManager.WriteDefaultSettings();
 
     display.Initialize();

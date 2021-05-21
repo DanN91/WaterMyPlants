@@ -53,33 +53,33 @@ void MenuController::ChangeMenu(MenuCode menuCode)
     m_menu = MenuCreator::Create(menuCode);
 
     // update range
-    m_cursor.Range({ 0, (m_menu.ItemsCount() > 0) ? m_menu.ItemsCount() - 1 : 0 });
+    m_cursor.Range({ 0, (m_menu->ItemsCount() > 0) ? m_menu->ItemsCount() - 1 : 0 });
     PrepareItemHandling();
-    WriteMenu(m_menu);
+    WriteMenu(*m_menu);
     m_cursor.Refresh(true);
 }
 
-void MenuController::WriteMenu(Menu& menu) const
+void MenuController::WriteMenu(IMenu& menu) const
 {
     m_display.Clear();
 
     // title & separator
-    m_display.Write(0, m_stringsManager.Read(m_menu.Title()), NokiaDisplay::Aligned::Center);
+    m_display.Write(0, m_stringsManager.Read(m_menu->Title()), NokiaDisplay::Aligned::Center);
     m_display.SetCursor(1, 0);
     m_display.Write(m_stringsManager.Read(Strings::Address::TitleSeparator));
 
     // items: text + value
-    for (uint8_t i = 0; i < m_menu.ItemsCount(); ++i)
+    for (uint8_t i = 0; i < m_menu->ItemsCount(); ++i)
         WriteMenuItem(i);
 }
 
 void MenuController::WriteMenuItem(uint8_t itemIndex) const
 {
-    if (const auto menuItem = m_menu.GetMenuItem(itemIndex))
+    if (const auto menuItem = m_menu->GetMenuItem(itemIndex))
     {
         const uint8_t itemLineIndex = LINE_OFFSET + itemIndex;
-        m_display.Write(itemLineIndex, m_stringsManager.Read(menuItem->Text()), NokiaDisplay::Aligned::Left);
-        m_display.Write(itemLineIndex, m_settingsManager.Read(menuItem->Value()), NokiaDisplay::Aligned::Right);
+        m_display.Write(itemLineIndex, menuItem->Text(), NokiaDisplay::Aligned::Left);
+        m_display.Write(itemLineIndex, menuItem->Value(), NokiaDisplay::Aligned::Right);
     }
 }
 
@@ -93,6 +93,6 @@ void MenuController::PrepareItemHandling()
     if (!m_cursor)
         return;
 
-    if (const auto currentItem = m_menu.GetMenuItem(m_cursor.Value()))
-        m_changeSetting.Reset(new ChangeSetting(m_display, m_menu, m_cursor.Value(), m_execution));
+    if (const auto currentItem = m_menu->GetMenuItem(m_cursor.Value()))
+        m_menu->HandleItem(m_cursor.Value());
 }

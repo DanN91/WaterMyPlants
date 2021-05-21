@@ -54,16 +54,13 @@ namespace Settings
 class SettingsManager final
 {
 public:
-    SettingsManager() = default;
-    ~SettingsManager() = default;
+    static uint32_t Read(Settings::Address address);
+    static bool Write(Settings::Address address, uint32_t value);
 
-    uint32_t Read(Settings::Address address) const;
-    bool Write(Settings::Address address, uint32_t value);
-
-    Settings::Range GetRange(Settings::Address address) const;
+    static Settings::Range GetRange(Settings::Address address);
 
     // Factory reset
-    void WriteDefaultSettings();
+    static void WriteDefaultSettings();
 
     // non-copyable & non-movable
     SettingsManager(const SettingsManager&) = delete;
@@ -72,8 +69,8 @@ public:
     SettingsManager& operator=(SettingsManager&&) = delete;
 
 private:
-    void WriteByte(Settings::Address address, uint8_t value);
-    uint8_t ReadByte(Settings::Address address) const;
-    void WriteShort(Settings::Address address, uint16_t value);
-    uint16_t ReadShort(Settings::Address address) const;
+    static void WriteByte(Settings::Address address, uint8_t value);
+    static uint8_t ReadByte(Settings::Address address);
+    static void WriteShort(Settings::Address address, uint16_t value);
+    static uint16_t ReadShort(Settings::Address address);
 };

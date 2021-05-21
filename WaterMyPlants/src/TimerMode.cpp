@@ -10,9 +10,8 @@
 
 #include <SettingsManager.h>
 
-TimerMode::TimerMode(WaterPump& waterPump, SettingsManager& settings)
+TimerMode::TimerMode(WaterPump& waterPump)
     : m_waterPump(waterPump)
-    , m_settings(settings)
 {
 }
 
@@ -29,7 +28,7 @@ void TimerMode::Run()
 
     if (!m_waterPump.IsOn())
     {
-        if (const auto WATERING_FREQUENCY_DAYS = m_settings.Read(Settings::Address::TimerModeFrequency); (currentMs - m_timeToWaterCounterMs) >= (WATERING_FREQUENCY_DAYS * Constants::Time::DAY_MS))
+        if (const auto WATERING_FREQUENCY_DAYS = SettingsManager::Read(Settings::Address::TimerModeFrequency); (currentMs - m_timeToWaterCounterMs) >= (WATERING_FREQUENCY_DAYS * Constants::Time::DAY_MS))
         {
             // turn on and track
             m_waterPump.TurnOn();
@@ -38,7 +37,7 @@ void TimerMode::Run()
     }
     else if (m_waterPump.IsOn())
     {
-        if (const auto WATERING_DURATION_SEC = m_settings.Read(Settings::Address::TimerModeDuration); (currentMs - m_startedWateringAtMs) >= (WATERING_DURATION_SEC * Constants::Time::SECOND_MS))
+        if (const auto WATERING_DURATION_SEC = SettingsManager::Read(Settings::Address::TimerModeDuration); (currentMs - m_startedWateringAtMs) >= (WATERING_DURATION_SEC * Constants::Time::SECOND_MS))
         {
             // turn off and start counting for next watering
             m_waterPump.TurnOff();

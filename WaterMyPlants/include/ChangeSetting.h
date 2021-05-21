@@ -9,18 +9,18 @@
 
 #include <ObserverPattern.h>
 #include <PushButtonMasks.h>
-#include <MenuItem.h>
+#include <SettingMenuItem.h>
 #include <RangeValuesGenerator.h>
 #include <SettingsManager.h>
 #include <StringsManager.h>
+#include <IMenu.h>
 
 class NokiaDisplay;
-class Menu;
 
 class ChangeSetting final : public IObserver<ButtonState>
 {
 public:
-    ChangeSetting(NokiaDisplay& display, const Menu& menu, uint8_t itemIndex, IObservable<ButtonState>& button);
+    ChangeSetting(NokiaDisplay& display, const IMenu& menu, uint8_t itemIndex, IObservable<ButtonState>& button);
     ~ChangeSetting();
 
     // IObserver
@@ -35,11 +35,11 @@ public:
 private:
     void UpdateItem(uint32_t value);
 
-    SettingsManager m_settings;
     StringsManager m_strings;
 
     const uint8_t m_itemIndex;
-    const MenuItem& m_menuItem;
+    const IMenuItem& m_menuItem;
+    Settings::Address m_address;
 
     RangeValuesGenerator m_generator;
     NokiaDisplay& m_display;

@@ -8,18 +8,20 @@
 
 #include <Arduino.h>
 
-#include <Menu.h>
+#include <IMenu.h>
+#include <UniquePtr.h>
 
 enum class MenuCode
 {
     Manual,
     Timer,
     Sensor,
+    Monitor,
     None // must be last
 };
 
 class MenuCreator final
 {
 public:
-    static Menu Create(MenuCode menuCode);
+    static UniquePtr<IMenu> Create(MenuCode menuCode);
 };

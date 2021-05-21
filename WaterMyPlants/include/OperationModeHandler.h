@@ -19,7 +19,7 @@
 class OperationModeHandler final : public IObserver<ButtonState>
 {
 public:
-    explicit OperationModeHandler(IObservable<ButtonState>& subject, SettingsManager& settings);
+    explicit OperationModeHandler(IObservable<ButtonState>& subject);
     ~OperationModeHandler() = default;
 
     void Initialize();
@@ -47,5 +47,4 @@ private:
     uint8_t m_currentModeIndex = 0;
 
     RangeValuesGenerator m_generator;
-    SettingsManager& m_settings;
 };

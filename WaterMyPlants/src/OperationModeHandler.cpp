@@ -5,11 +5,10 @@
 */
 #include "OperationModeHandler.h"
 
-OperationModeHandler::OperationModeHandler(IObservable<ButtonState>& subject, SettingsManager& settings)
+OperationModeHandler::OperationModeHandler(IObservable<ButtonState>& subject)
     : IObserver(ButtonState::Released, subject)
-    , m_currentModeIndex(settings.Read(Settings::Address::LastOperationMode))
+    , m_currentModeIndex(SettingsManager::Read(Settings::Address::LastOperationMode))
     , m_generator({ 0, 0 }, 1, m_currentModeIndex, subject) // range is set in Initialize, after operation modes have been added
-    , m_settings(settings)
 {
     subject.Register(&m_generator);
     subject.Register(this);
@@ -47,7 +46,7 @@ void OperationModeHandler::SetOperationMode(uint8_t operationModeIndex)
         (*nextMode)->Activate();
 
     m_currentModeIndex = operationModeIndex;
-    m_settings.Write(Settings::Address::LastOperationMode, m_currentModeIndex);
+    SettingsManager::Write(Settings::Address::LastOperationMode, m_currentModeIndex);
 }
 
 uint8_t OperationModeHandler::CurrentModeIndex() const

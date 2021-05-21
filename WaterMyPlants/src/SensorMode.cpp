@@ -14,10 +14,9 @@ namespace
     constexpr uint8_t WAITING_BREAK_MIN = 1;
 } // anonymous
 
-SensorMode::SensorMode(SoilMoistureSensor& soilMoistureSensor, LightSensor& lightSensor, WaterPump& waterPump, SettingsManager& settings)
+SensorMode::SensorMode(SoilMoistureSensor& soilMoistureSensor, LightSensor& lightSensor, WaterPump& waterPump)
     : IObserver<SoilMoistureEvent>(SoilMoistureEvent::MoistureChanged, soilMoistureSensor)
     , IObserver<LightSensorEvent>(LightSensorEvent::IntensityChanged, lightSensor)
-    , m_settings(settings)
     , m_soilMoistureSensor(soilMoistureSensor)
     , m_lightSensor(lightSensor)
     , m_waterPump(waterPump)
@@ -101,17 +100,17 @@ void SensorMode::StopWatering()
 inline bool SensorMode::IsSoilDry() const
 {
     // if watering has started, we need to water until the Wet threshold is reached
-    return m_waterPump.IsOn() ? !IsSoilWet() : (m_soilMoistureSensor.Value() <= m_settings.Read(Settings::Address::SensorModeDry));
+    return m_waterPump.IsOn() ? !IsSoilWet() : (m_soilMoistureSensor.Value() <= SettingsManager::Read(Settings::Address::SensorModeDry));
 }
 
 inline bool SensorMode::IsSoilWet() const
 {
-    return m_soilMoistureSensor.Value() >= m_settings.Read(Settings::Address::SensorModeWet);
+    return m_soilMoistureSensor.Value() >= SettingsManager::Read(Settings::Address::SensorModeWet);
 }
 
 inline bool SensorMode::IsNight() const
 {
-    return m_lightSensor.Value() <= m_settings.Read(Settings::Address::SensorModeLightThreshold);
+    return m_lightSensor.Value() <= SettingsManager::Read(Settings::Address::SensorModeLightThreshold);
 }
 
 bool SensorMode::IsTimeToTakeABrake() const

@@ -16,7 +16,7 @@ class SettingsManager;
 class TimerMode final : public IOperationMode
 {
 public:
-    TimerMode(WaterPump& waterPump, SettingsManager& settings);
+    TimerMode(WaterPump& waterPump);
     ~TimerMode();
 
     // IOperationMode
@@ -26,7 +26,6 @@ public:
 
 private:
     WaterPump& m_waterPump;
-    SettingsManager& m_settings;
 
     uint32_t m_startedWateringAtMs = 0;
     uint32_t m_timeToWaterCounterMs = 0;
