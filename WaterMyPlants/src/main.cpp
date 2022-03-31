@@ -46,7 +46,7 @@ SensorMode sensorMode(soilMoistureSensor, lightSensor, waterPump);
 
 void setup()
 {
-    // Serial.begin(9600);
+    //Serial.begin(9600); // #TODO:TESTONLY
 
     // Operation Mode Handler
     operationHandler.Add(manualMode);
@@ -94,13 +94,13 @@ void loop()
     // on Manual menu show this data for calibration purposes
     if (menuController.IsEmptyMenu() && (millis() - previous) >= 1500) // once every second
     {
-        const auto PrintSensorValues = [](const char* name, uint16_t rawValue, uint8_t percentValue){
-            Serial.print(name);
-            Serial.print(rawValue);
-            Serial.print(" ( ");
-            Serial.print(percentValue);
-            Serial.println(" % )");
-        };
+        // const auto PrintSensorValues = [](const char* name, uint16_t rawValue, uint8_t percentValue){
+        //     Serial.print(name);
+        //     Serial.print(rawValue);
+        //     Serial.print(" ( ");
+        //     Serial.print(percentValue);
+        //     Serial.println(" % )");
+        // };
 
         const auto lightValue = lightSensor.RawValue();
         // const auto lightPercent = lightSensor.Value();
