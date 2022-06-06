@@ -25,8 +25,12 @@ public:
     void Deactivate() override;
 
 private:
+    // wrappers
+    bool IsTimeToStartWatering() const;
+    bool IsTimeToStopWatering() const;
+
     WaterPump& m_waterPump;
 
     uint32_t m_startedWateringAtMs = 0;
-    uint32_t m_timeToWaterCounterMs = 0;
+    uint32_t m_lastWateringAtMs = 0;
 };

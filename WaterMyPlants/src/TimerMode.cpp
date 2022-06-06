@@ -24,35 +24,39 @@ TimerMode::~TimerMode()
 
 void TimerMode::Run()
 {
-    volatile auto currentMs = millis();
-
-    if (!m_waterPump.IsOn())
+    if (IsTimeToStartWatering())
     {
-        if (const auto WATERING_FREQUENCY_DAYS = SettingsManager::Read(Settings::Address::TimerModeFrequency); (currentMs - m_timeToWaterCounterMs) >= (WATERING_FREQUENCY_DAYS * Constants::Time::DAY_MS))
-        {
-            // turn on and track
-            m_waterPump.TurnOn();
-            m_startedWateringAtMs = millis();
-        }
+        // turn on and start tracking watering time
+        m_waterPump.TurnOn();
+        m_startedWateringAtMs = millis();
     }
-    else if (m_waterPump.IsOn())
+    else if (IsTimeToStopWatering())
     {
-        if (const auto WATERING_DURATION_SEC = SettingsManager::Read(Settings::Address::TimerModeDuration); (currentMs - m_startedWateringAtMs) >= (WATERING_DURATION_SEC * Constants::Time::SECOND_MS))
-        {
-            // turn off and start counting for next watering
-            m_waterPump.TurnOff();
-            m_timeToWaterCounterMs = millis();
-        }
+        // turn off and start counting for next watering
+        m_waterPump.TurnOff();
+        m_lastWateringAtMs = millis();
     }
 }
 
 void TimerMode::Activate()
 {
-    m_timeToWaterCounterMs = millis();
+    m_lastWateringAtMs = millis();
 }
 
 void TimerMode::Deactivate()
 {
     if (m_waterPump.IsOn())
         m_waterPump.TurnOff();
+}
+
+inline bool TimerMode::IsTimeToStartWatering() const
+{
+    const auto WAIT_TO_WATER_DURATION_MS = SettingsManager::Read(Settings::Address::TimerModeFrequency) * Constants::Time::DAY_MS;
+    return !m_waterPump.IsOn() && ((millis() - m_lastWateringAtMs) >= WAIT_TO_WATER_DURATION_MS);
+}
+
+inline bool TimerMode::IsTimeToStopWatering() const
+{
+    const auto WATERING_DURATION_MS = SettingsManager::Read(Settings::Address::TimerModeDuration) * Constants::Time::SECOND_MS;
+    return m_waterPump.IsOn() && ((millis() - m_startedWateringAtMs) >= WATERING_DURATION_MS);
 }
