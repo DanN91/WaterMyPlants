@@ -8,6 +8,7 @@
 #include <MenuController.h>
 #include <SettingsManager.h>
 #include <StringsManager.h>
+#include <TimerManager.h>
 
 #include <SoilMoistureSensor.h>
 #include <LightSensor.h>
@@ -38,7 +39,8 @@ MenuController menuController(display, modeChangerButton, menuNavigationButton, 
 WaterPump waterPump(Hardware::WATER_PUMP_PIN);
 ManualMode manualMode(waterPump, executionButton);
 
-TimerMode timerMode(waterPump);
+TimerManager timerManager(1); // Observers: [TimerMode]
+TimerMode timerMode(waterPump, timerManager);
 
 SoilMoistureSensor soilMoistureSensor(Hardware::SOIL_MOISTURE_SENSOR_PIN, SoilMoistureSensor::Sensitivity::Medium);
 LightSensor lightSensor(Hardware::LIGHT_SENSOR_PIN, LightSensor::Sensitivity::High);
@@ -46,7 +48,9 @@ SensorMode sensorMode(soilMoistureSensor, lightSensor, waterPump);
 
 void setup()
 {
-    //Serial.begin(9600); // #TODO:TESTONLY
+    // Serial.begin(115200); // #TODO:TESTONLY
+    timerManager.Initialize();
+    timerManager.Activate();
 
     // Operation Mode Handler
     operationHandler.Add(manualMode);
@@ -165,4 +169,10 @@ void loop()
 
         previous = millis();
     }
+}
+
+// ISR used by timer manager to notify observers
+ISR(TIMER1_COMPA_vect)
+{
+    timerManager.OnTrigger();
 }

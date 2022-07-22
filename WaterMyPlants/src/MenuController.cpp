@@ -65,7 +65,7 @@ void MenuController::WriteMenu(Menu& menu) const
     m_display.Clear();
 
     // title & separator
-    m_display.Write(0, m_stringsManager.Read(m_menu.Title()), NokiaDisplay::Aligned::Center);
+    m_display.Write(0, m_stringsManager.Read(m_menu.Title()), NokiaDisplay::Aligned::Left);
     m_display.SetCursor(1, 0);
     m_display.Write(m_stringsManager.Read(Strings::Address::TitleSeparator));
 

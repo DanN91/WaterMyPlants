@@ -10,19 +10,24 @@
 
 #include <WaterPump.h>
 #include <IOperationMode.h>
+#include <ObserverPattern.h>
+#include <TimerManager.h>
 
 class SettingsManager;
 
-class TimerMode final : public IOperationMode
+class TimerMode final : public IOperationMode, public IObserver<TimerEvent>
 {
 public:
-    TimerMode(WaterPump& waterPump);
+    TimerMode(WaterPump& waterPump, IObservable<TimerEvent>& timerManager);
     ~TimerMode();
 
     // IOperationMode
     void Run() override;
     void Activate() override;
     void Deactivate() override;
+
+    // IObserver<TimerEvent>
+    void OnEvent(TimerEvent event) override;
 
 private:
     // wrappers
@@ -31,6 +36,5 @@ private:
 
     WaterPump& m_waterPump;
 
-    uint32_t m_startedWateringAtMs = 0;
-    uint32_t m_lastWateringAtMs = 0;
+    uint32_t m_elapsedSeconds = 0;
 };
