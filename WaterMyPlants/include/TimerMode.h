@@ -37,4 +37,5 @@ private:
     WaterPump& m_waterPump;
 
     uint32_t m_elapsedSeconds = 0;
+    uint8_t m_elapsedDays = 0;
 };

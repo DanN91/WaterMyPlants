@@ -10,9 +10,8 @@
 
 #include <SettingsManager.h>
 
-TimerMode::TimerMode(WaterPump& waterPump, IObservable<TimerEvent>& timerManager)
-    : IObserver(TimerEvent::Second, timerManager) // #DNN:TODO:See what's appropriate
-    , m_waterPump(waterPump)
+TimerMode::TimerMode(WaterPump &waterPump, IObservable<TimerEvent> &timerManager)
+    : IObserver(TimerEvent::Minute, timerManager), m_waterPump(waterPump)
 {
 }
 
@@ -32,12 +31,16 @@ void TimerMode::Run()
     {
         // turn on and start tracking watering time
         m_waterPump.TurnOn();
-        m_elapsedSeconds = 0; // reset counter
+
+        SetEvents(TimerEvent::Second);
+        m_elapsedDays = 0; // reset counter
     }
     else if (IsTimeToStopWatering())
     {
         // turn off and start counting for next watering
         m_waterPump.TurnOff();
+
+        SetEvents(TimerEvent::Day);
         m_elapsedSeconds = 0; // reset counter
     }
 }
@@ -57,20 +60,28 @@ void TimerMode::Deactivate()
 
 void TimerMode::OnEvent(TimerEvent event)
 {
-    if ((event & TimerEvent::Second) == TimerEvent::Second)
+    switch (Events() & event)
     {
-        m_elapsedSeconds++;
+        case TimerEvent::Second:
+        {
+            m_elapsedSeconds++;
+            break;
+        }
+
+        case TimerEvent::Day:
+        {
+            m_elapsedDays++;
+            break;
+        }
     }
 }
 
 inline bool TimerMode::IsTimeToStartWatering() const
 {
-    const auto WAIT_TO_WATER_DURATION_SEC = (SettingsManager::Read(Settings::Address::TimerModeFrequency) * Constants::Time::DAY_MS) / Constants::Time::SECOND_MS;
-    return !m_waterPump.IsOn() && (m_elapsedSeconds >= WAIT_TO_WATER_DURATION_SEC);
+    return !m_waterPump.IsOn() && (m_elapsedDays >= SettingsManager::Read(Settings::Address::TimerModeFrequency));
 }
 
 inline bool TimerMode::IsTimeToStopWatering() const
 {
-    const auto WATERING_DURATION_SEC = SettingsManager::Read(Settings::Address::TimerModeDuration);
-    return m_waterPump.IsOn() && (m_elapsedSeconds >= WATERING_DURATION_SEC);
+    return m_waterPump.IsOn() && (m_elapsedSeconds >= SettingsManager::Read(Settings::Address::TimerModeDuration));
 }
