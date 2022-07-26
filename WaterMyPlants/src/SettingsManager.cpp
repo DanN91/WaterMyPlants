@@ -86,10 +86,10 @@ Settings::Range SettingsManager::GetRange(Settings::Address address)
             return { 1, 7, 1 }; // 7 days
 
         case Address::SensorModeDry:
-            return { 5, 50, 5 }; // #DNN:Test real-world
+            return { 5, 90, 5 }; // #DNN:Test real-world
 
         case Address::SensorModeWet:
-            return { 30, 90, 5 };
+            return { 30, 100, 5 };
 
         case Address::SensorModeLightThreshold:
             return { 10, 100, 5 };

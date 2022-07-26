@@ -10,7 +10,7 @@
 
 namespace
 {
-    constexpr uint8_t WATERING_DURATION_SEC = 10;
+    constexpr uint8_t WATERING_DURATION_SEC = 30;
     constexpr uint8_t WAITING_BREAK_MIN = 1;
 } // anonymous
 
