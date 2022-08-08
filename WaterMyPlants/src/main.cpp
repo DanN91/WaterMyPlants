@@ -3,15 +3,18 @@
 #include <Hardware.h>
 #include <PushButton.h>
 #include <NokiaDisplay.h>
+#include <SoilMoistureSensor.h>
+#include <LightSensor.h>
+
+#include <Menu.h>
 #include <MenuCursor.h>
 #include <MenuCreator.h>
 #include <MenuController.h>
 #include <SettingsManager.h>
+
+#include <SleepManager.h>
 #include <StringsManager.h>
 #include <TimerManager.h>
-
-#include <SoilMoistureSensor.h>
-#include <LightSensor.h>
 
 #include <OperationModeHandler.h>
 #include <RangeValuesGenerator.h>
@@ -20,8 +23,6 @@
 #include <ManualMode.h>
 #include <TimerMode.h>
 #include <SensorMode.h>
-
-#include <Menu.h>
 
 PushButton modeChangerButton(Hardware::MODE_CHANGER_BUTTON_PIN);
 PushButton executionButton(Hardware::EXECUTION_BUTTON_PIN);
@@ -37,18 +38,43 @@ MenuController menuController(display, modeChangerButton, menuNavigationButton, 
 
 // Operation Modes
 WaterPump waterPump(Hardware::WATER_PUMP_PIN);
-ManualMode manualMode(waterPump, executionButton);
 
-TimerManager timerManager(1); // Observers: [TimerMode]
+TimerManager timerManager(2); // Observers: [ManualMode, TimerMode]
 TimerMode timerMode(waterPump, timerManager);
+
+ManualMode manualMode(waterPump, executionButton, timerManager);
 
 SoilMoistureSensor soilMoistureSensor(Hardware::SOIL_MOISTURE_SENSOR_PIN, SoilMoistureSensor::Sensitivity::Medium);
 LightSensor lightSensor(Hardware::LIGHT_SENSOR_PIN, LightSensor::Sensitivity::High);
 SensorMode sensorMode(soilMoistureSensor, lightSensor, waterPump);
 
+SleepManager sleepManager(
+    SleepMask::AllUnusedPinsLow
+    | SleepMask::DisableBOD
+    | SleepMask::DisableADC
+    | SleepMask::UseInterrupt1
+    , 8, [&timerManager, &display](){
+        static uint32_t count = 0;
+        timerManager.Deactivate();
+        display.TurnOff();
+
+        Serial.print("Gone to sleep: ");
+        Serial.println(count++);
+        Serial.flush();
+    }, [&timerManager, &display](){
+        timerManager.Activate();
+        display.TurnOn();
+
+        Serial.println("Woke from sleep.");
+        Serial.flush();
+    }); // wake up once every hour
+
 void setup()
 {
-    // Serial.begin(115200); // #TODO:TESTONLY
+    Serial.begin(115200); // #TODO:TESTONLY
+
+    sleepManager.Initialize();
+
     timerManager.Initialize();
     timerManager.Activate();
 
@@ -72,6 +98,9 @@ void setup()
 
     display.Initialize();
     menuController.Initialize();
+
+    operationHandler.SetOperationMode(0);
+    Serial.println("Initialized.");
 }
 
 uint32_t previous = millis();
@@ -85,6 +114,8 @@ uint16_t maxLight = 0;
 
 void loop()
 {
+    Serial.println("Looping..."); // #DNN:TODO:Remove
+
     // buttons
     modeChangerButton.HandleEvents();
     menuNavigationButton.HandleEvents();
@@ -169,6 +200,8 @@ void loop()
 
         previous = millis();
     }
+
+    sleepManager.Sleep();
 }
 
 // ISR used by timer manager to notify observers

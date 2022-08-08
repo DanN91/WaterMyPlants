@@ -4,15 +4,10 @@
 
 #include "ManualMode.h"
 
-#include "PushButtonMasks.h"
 
-namespace
-{
-    static constexpr uint32_t MAX_ON_TIME_LIMIT_MS = 300000u; // 5 minutes
-} // anonymous
-
-ManualMode::ManualMode(WaterPump& waterPump, IObservable<ButtonState>& button)
-    : IObserver(ButtonState::Released, button)
+ManualMode::ManualMode(WaterPump& waterPump, IObservable<ButtonState>& button, IObservable<TimerEvent>& timer)
+    : IObserver<ButtonState>(ButtonState::Released, button)
+    , IObserver<TimerEvent>(TimerEvent::Minute, timer)
     , m_waterPump(waterPump)
 {
 }
@@ -29,21 +24,32 @@ void ManualMode::OnEvent(ButtonState event)
     {
         m_waterPump.IsOn() ? m_waterPump.TurnOff() : m_waterPump.TurnOn();
 
-        if (m_waterPump.IsOn())
-            m_lastOn = millis();
+        if (!m_waterPump.IsOn())
+            m_safetyCounter = 0;
+    }
+}
+
+void ManualMode::OnEvent(TimerEvent event)
+{
+    if (m_waterPump.IsOn() && !!(event & TimerEvent::Minute))
+    {
+        m_safetyCounter++;
+        if (m_safetyCounter >= 5) // safeguard against too much watering: 5 minutes max.
+        {
+            m_waterPump.TurnOff();
+            m_safetyCounter = 0;
+        }
     }
 }
 
 void ManualMode::Run()
 {
-    // safeguard against too much watering
-    if (m_waterPump.IsOn() && (millis() - m_lastOn) > MAX_ON_TIME_LIMIT_MS)
-        m_waterPump.TurnOff();
 }
 
 void ManualMode::Activate()
 {
-    Register();
+    IObserver<ButtonState>::Register();
+    IObserver<TimerEvent>::Register();
 }
 
 void ManualMode::Deactivate()
@@ -51,5 +57,6 @@ void ManualMode::Deactivate()
     if (m_waterPump.IsOn())
         m_waterPump.TurnOff();
 
-    Unregister();
+    IObserver<TimerEvent>::Unregister();
+    IObserver<ButtonState>::Unregister();
 }
